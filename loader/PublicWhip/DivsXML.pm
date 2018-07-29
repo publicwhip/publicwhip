@@ -12,6 +12,8 @@
 package PublicWhip::DivsXML;
 use strict;
 
+use File::Slurp;
+use JSON;
 use XML::Twig;
 use Text::Autoformat;
 use PublicWhip::DB;
@@ -300,9 +302,9 @@ sub loaddivision {
 # Should emdashes in headings have spaces round them?  This removes them if they shouldn't.
 # $heading =~ s/ \&\#8212; /\&\#8212;/g;
 
-    my $url         = $div->att('url');
+    my $url         = $div->att('url') || "";
     my $gid         = $div->att('id');
-    my $debate_url  = $lastheadingurl;
+    my $debate_url  = $lastheadingurl || "";
     my $debate_gid  = $lastheadinggid;
     my $motion_text = $lastmotiontext;
     my $clock_time = $div->att('time');
@@ -376,12 +378,17 @@ sub loaddivision {
             elsif ( $tell eq "yes" ) { $tell = "tell"; }
             else { die "unexpected tell value $tell"; }
             my $id = $mpname->att('id');
+            if (!$id) {
+                $id = person_to_member($mpname->att('person_id'), $house, $divdate);
+            }
+            die "Not an integer MP identifier: " . $mpname->sprint unless $id;
+            # print STDERR "$vote $tell $id\n";
             if ($house eq 'commons' or $house eq 'scotland') {
                 $id =~ s:uk.org.publicwhip/member/::;
             } else {
                 $id =~ s:uk.org.publicwhip/lord/::;
             }
-            die "Not an integer MP identifier: $id" if ($id !~ m/^[1-9][0-9]*$/);
+            die "Not an integer MP identifier: '$id' " . $mpname->sprint if ($id !~ m/^[1-9][0-9]*$/);
             if ($house eq 'lords') {
                 $vote = 'aye' if $vote eq 'content';
                 $vote = 'no' if $vote eq 'not-content';
@@ -417,7 +424,7 @@ debate_url, source_gid, debate_gid, clock_time from pw_division where
         my $existing_heading    = $data[2];
         my $existing_motion     = $data[3];
         my $existing_source_url = $data[4];
-        my $existing_debate_url = $data[5];
+        my $existing_debate_url = $data[5] || "";
         my $existing_source_gid = $data[6];
         my $existing_debate_gid = $data[7];
         my $existing_clock_time = $data[8];
@@ -631,6 +638,55 @@ sub loadspmotion {
 	my @newarray = ();
 	push(@newarray,\%m);
 	$spmotions{$spid} = \@newarray;
+    }
+}
+
+# People loading
+
+my %memberships;
+my %redirects;
+
+sub loadpeople {
+    my $members_location = $PublicWhip::Config::members_location;
+    my $j = decode_json(read_file($members_location. '/people.json'));
+    my %posts;
+    foreach (@{$j->{posts}}) {
+        $posts{$_->{id}} = $_;
+    }
+    foreach (@{$j->{memberships}}) {
+        my ($org_slug, $house);
+        if ($_->{post_id}) {
+            $org_slug = $posts{$_->{post_id}}{organization_id};
+        } else {
+            $org_slug = $_->{organization_id};
+        }
+        next unless $org_slug; # A redirect
+        if ( $org_slug eq 'house-of-commons' ) {
+            $house = 'commons';
+        } elsif ( $org_slug eq 'scottish-parliament' ) {
+            $house = 'scotland';
+        } elsif ( $org_slug eq 'house-of-lords' ) {
+            $house = 'lords';
+        } else {
+            # MLA who we don't cover
+            next;
+        }
+        push @{$memberships{$_->{person_id}}{$house}}, { id => $_->{id}, start_date => $_->{start_date}, end_date => $_->{end_date} || '9999-12-31' };
+    }
+    foreach (@{$j->{persons}}) {
+      if ($_->{redirect}) {
+        $redirects{$_->{id}}=$_->{redirect};
+      }
+    }
+}
+
+sub person_to_member {
+    my ($pid, $house, $date) = @_;
+    if ($redirects{$pid}) {
+        $pid=$redirects{$pid};
+    }
+    foreach (@{$memberships{$pid}{$house}}) {
+        return $_->{id} if $_->{start_date} le $date && $date le $_->{end_date};
     }
 }
 

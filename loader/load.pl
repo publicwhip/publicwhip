@@ -100,6 +100,7 @@ sub clean {
 }
 
 sub all_divsxml {
+    PublicWhip::DivsXML::loadpeople();
     PublicWhip::DivsXML::read_xml_files( $dbh, $from, $to, $PublicWhip::Config::debatepath, $PublicWhip::Config::fileprefix, "commons");
     PublicWhip::DivsXML::read_xml_files( $dbh, $from, $to, $PublicWhip::Config::lordsdebatepath, $PublicWhip::Config::lordsfileprefix, "lords");
     PublicWhip::DivsXML::read_xml_files( $dbh, $from, $to, $PublicWhip::Config::scotlanddebatepath, $PublicWhip::Config::scotlandfileprefix, "scotland", $PublicWhip::Config::scotlandmotionspath);

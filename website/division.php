@@ -267,6 +267,9 @@ function no_division_found($plural)
 
     # Display title and second nav links
     $second_type = "tabs";
+    if ( $_SERVER['REMOTE_ADDR'] == '46.43.39.75' || $_SERVER['REMOTE_ADDR'] == '46.43.39.78' || $_SERVER['HTTP_CF_CONNECTING_IP'] == '46.43.39.75' || $_SERVER['HTTP_CF_CONNECTING_IP'] == '46.43.39.78' ) {
+        $second_type = "";
+    }
     pw_header();
 
 	# Summary
@@ -405,7 +408,7 @@ function no_division_found($plural)
 		if ($singlemotionpage)
 		{
 	    	# Show motion text
-            /**$edit_link = "account/wiki.php?type=motion&date=".$divattr["division_date"].
+            $edit_link = "account/wiki.php?type=motion&date=".$divattr["division_date"].
                 "&number=".$divattr["division_number"]."&house=".$divattr["house"].
                 "&rr=".urlencode($_SERVER["REQUEST_URI"]);
             $history_link = "edits.php?type=motion&date=".$divattr["division_date"].
@@ -413,10 +416,10 @@ function no_division_found($plural)
             $discuss_url = "division-forum.php?date=".$divattr["division_date"].
                 "&number=".$divattr["division_number"]."&house=".$divattr["house"];
 
-            $db->query("SELECT * FROM pw_dyn_user WHERE user_id = " . $motion_data['user_id']);
-            $row = $db->fetch_row_assoc();
+            $row = $pwpdo->get_single_row("SELECT * FROM pw_dyn_user WHERE user_id = ?", array( $motion_data['user_id'] ));
+            // $row = $db->fetch_row_assoc();
             $last_editor = html_scrub($row['user_name']);
-            **/
+            
 	        if (($divattr["house"] == "lords") and ($divattr["division_date"] >= "2009-01-21"))
             {
                 $ldasess = "2008_09";
@@ -430,10 +433,12 @@ function no_division_found($plural)
             }
 
             print "<div class=\"motion\">";
-	        //if ($motion_data['user_id'] == 0) {
-            //    print "<p><strong>Description automatically extracted from the debate,
-            //        please <a href=\"$edit_link\">edit it</a> to make it better.</strong></p>";
-	        //}
+            if ( $_SERVER['REMOTE_ADDR'] == '46.43.39.75' || $_SERVER['REMOTE_ADDR'] == '46.43.39.78'  || $_SERVER['HTTP_CF_CONNECTING_IP'] == '46.43.39.75' || $_SERVER['HTTP_CF_CONNECTING_IP'] == '46.43.39.78' ) {
+	        if ($motion_data['user_id'] == 0) {
+                print "<p><strong>Description automatically extracted from the debate,
+                    please <a href=\"$edit_link\">edit it</a> to make it better.</strong></p>";
+	        }
+            }
             $description = extract_motion_text_from_wiki_text($motion_data['text_body']);
             print $description;
 
@@ -459,7 +464,9 @@ function no_division_found($plural)
 	        if ($source != "") 
 	    		print "<b><a href=\"$source\" title=\"The original record of vote as reported by Hansard\">".($debate_gid ? "Source" : "Online Hansard")."</a></b> | ";
 		
-           // print "<b><a href=\"$edit_link\" title=\"Edit and improve this description\">Edit</a></b>";
+            if ( $_SERVER['REMOTE_ADDR'] == '46.43.39.75' || $_SERVER['REMOTE_ADDR'] == '46.43.39.78' || $_SERVER['HTTP_CF_CONNECTING_IP'] == '46.43.39.75' || $_SERVER['HTTP_CF_CONNECTING_IP'] == '46.43.39.78'  ) {
+                print "<b><a href=\"$edit_link\" title=\"Edit and improve this description\">Edit</a></b>";
+            }
             //print " (<a href=\"faq.php#motionedit\">learn more</a>)";
            // if ($discuss_url)
            //     print ' | <b><a href="'.htmlspecialchars($discuss_url).'" title="Forum page for this vote, including record of changes">Discussion</a></b>';

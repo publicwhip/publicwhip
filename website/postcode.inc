@@ -72,17 +72,33 @@ function postcode_to_constituencies($db, $postcode) {
         return array('ERROR' => "The postcode was malformed.");
     $useful_types = array("WMC", "SPC", "SPE");
 
-    $response = get_text_from_http( 'mapit.mysociety.org', 80, '/postcode/' . rawurlencode($postcode) );
-    if (!$response)
+    $postcode=preg_replace('/[^A-Z0-9]/','',strtoupper($postcode));
+    $cacheFile=__DIR__.'/../postcodecache/'.$postcode.'.json';
+    $response=false;
+    $readFromCache=false;
+    if (file_exists($cacheFile)) {
+	$response=file_get_contents($cacheFile);
+        $readFromCache=true;
+    } else {
+	try {
+    		$response = get_text_from_http( 'mapit.mysociety.org', 80, '/postcode/' . rawurlencode($postcode).'?api_key=');
+    	} catch (Exception $e) {
+     		$response='';
+    	}
+    }
+    if (!$response) {
         return array('ERROR' => "There was an error looking up that postcode.");
-
-    $response = json_decode($response, true);
-    if ($response['error']) {
+    }
+    if (''===trim($response)) {
+	return array('ERROR'=>'Sorry, there is currently an issue with the postcode lookup service... Please try again later and/or email us at team@publicwhip.org.uk');
+    }
+    $jsonResponse = json_decode($response, true);
+    if ($jsonResponse['error']) {
         return array ("ERROR" => "The postcode server returned an error.");
     }
 
     $final_result = array();
-    foreach ($response['areas'] as $match) {
+    foreach ($jsonResponse['areas'] as $match) {
         $type = $match['type'];
         $name = $match['name'];
         if (!in_array($type, $useful_types)) continue;
@@ -94,10 +110,30 @@ function postcode_to_constituencies($db, $postcode) {
     }
     if (!$final_result)
         return array ("ERROR" => "There was an unexpected response when looking up the postcode.");
+    if (false===$readFromCache) {
+       file_put_contents($cacheFile,$response);
+    }
     return $final_result;
 }
 
 function get_text_from_http( $domain, $port, $path ) {
+	$useCurl=false;
+	if (true===function_exists('curl_init')) {
+		$useCurl=true;
+	}
+	if (true===$useCurl) {
+		$curl=curl_init('https://'.$domain.$path);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+		$output = curl_exec($curl);
+		curl_close($curl);
+		return $output;
+	}
+	$contents=file_get_contents('https://'.$domain.$path);
+	return $contents;
+	
+	/**
+	 * Old code
+ 	*/
 	$file = ""; // just to be safe. Dunno, if this is really needed
     $timeout = 5;
     $fp = @fsockopen($domain, $port, $errno, $errstr, $timeout);

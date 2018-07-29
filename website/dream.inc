@@ -167,28 +167,52 @@ function update_dreammp_person_distance($db, $dreamid)
 
 	# now go and rebuild all the distances
 
-	$qselect = "SELECT pw_mp.person AS person, ";
-
-	$qselect .= "SUM((pw_dyn_dreamvote.vote = 'aye' AND (pw_vote.vote = 'aye' OR pw_vote.vote = 'tellaye'))
-					 OR (pw_dyn_dreamvote.vote = 'no' AND (pw_vote.vote = 'no' OR pw_vote.vote = 'tellno')))
-					 AS nvotessame, ";
-	$qselect .= "SUM((pw_dyn_dreamvote.vote = 'aye3' AND (pw_vote.vote = 'aye' OR pw_vote.vote = 'tellaye'))
-					 OR (pw_dyn_dreamvote.vote = 'no3' AND (pw_vote.vote = 'no' OR pw_vote.vote = 'tellno')))
-					 AS nvotessamestrong, ";
-	$qselect .= "SUM((pw_dyn_dreamvote.vote = 'aye' AND (pw_vote.vote = 'no' OR pw_vote.vote = 'tellno'))
-					 OR (pw_dyn_dreamvote.vote = 'no' AND (pw_vote.vote = 'aye' OR pw_vote.vote = 'tellaye')))
-					 AS nvotesdiffer, ";
-	$qselect .= "SUM((pw_dyn_dreamvote.vote = 'aye3' AND (pw_vote.vote = 'no' OR pw_vote.vote = 'tellno'))
-					 OR (pw_dyn_dreamvote.vote = 'no3' AND (pw_vote.vote = 'aye' OR pw_vote.vote = 'tellaye')))
-					 AS nvotesdifferstrong, ";
-	$qselect .= "SUM((pw_dyn_dreamvote.vote = 'aye' OR pw_dyn_dreamvote.vote = 'no')
-					 AND (pw_vote.vote = 'both' OR pw_vote.vote IS null))
-					 AS nvotesabsent, ";
-	$qselect .= "SUM((pw_dyn_dreamvote.vote = 'aye3' OR pw_dyn_dreamvote.vote = 'no3')
-					 AND (pw_vote.vote = 'both' OR pw_vote.vote IS null))
-					 AS nvotesabsentstrong, ";
-	$qselect .= "SUM(pw_vote.vote IS NOT null)
-					 AS nvotesoverlap ";
+	$div_aye_vote = "(SELECT count(*) FROM pw_vote pv2 WHERE pv2.division_id = pw_division.division_id AND vote = 'aye')";
+	$div_no_vote = "(SELECT count(*) FROM pw_vote pv2 WHERE pv2.division_id = pw_division.division_id AND vote = 'no')";
+	$qselect = "SELECT pw_mp.person AS person,
+SUM(
+	(pw_dyn_dreamvote.vote = 'aye' AND pw_vote.vote = 'aye')
+	OR (pw_dyn_dreamvote.vote = 'aye' AND pw_vote.vote = 'tellaye' AND $div_aye_vote > 0)
+	OR (pw_dyn_dreamvote.vote = 'no' AND pw_vote.vote = 'no')
+	OR (pw_dyn_dreamvote.vote = 'no' AND pw_vote.vote = 'tellno' AND $div_no_vote > 0)
+) AS nvotessame,
+SUM(
+	(pw_dyn_dreamvote.vote = 'aye3' AND pw_vote.vote = 'aye')
+	OR (pw_dyn_dreamvote.vote = 'aye3' AND pw_vote.vote = 'tellaye' AND $div_aye_vote > 0)
+	OR (pw_dyn_dreamvote.vote = 'no3' AND pw_vote.vote = 'no')
+	OR (pw_dyn_dreamvote.vote = 'no3' AND pw_vote.vote = 'tellno' AND $div_no_vote > 0)
+) AS nvotessamestrong,
+SUM(
+	(pw_dyn_dreamvote.vote = 'aye' AND pw_vote.vote = 'no')
+	OR (pw_dyn_dreamvote.vote = 'aye' AND pw_vote.vote = 'tellno' AND $div_no_vote > 0)
+	OR (pw_dyn_dreamvote.vote = 'no' AND pw_vote.vote = 'aye')
+	OR (pw_dyn_dreamvote.vote = 'no' AND pw_vote.vote = 'tellaye' AND $div_aye_vote > 0)
+) AS nvotesdiffer,
+SUM(
+	(pw_dyn_dreamvote.vote = 'aye3' AND pw_vote.vote = 'no')
+	OR (pw_dyn_dreamvote.vote = 'aye3' AND pw_vote.vote = 'tellno' AND $div_no_vote > 0)
+	OR (pw_dyn_dreamvote.vote = 'no3' AND pw_vote.vote = 'aye')
+	OR (pw_dyn_dreamvote.vote = 'no3' AND pw_vote.vote = 'tellaye' AND $div_aye_vote > 0)
+) AS nvotesdifferstrong,
+SUM(
+	(pw_dyn_dreamvote.vote = 'aye' OR pw_dyn_dreamvote.vote = 'no')
+	AND (
+		pw_vote.vote = 'both'
+		OR pw_vote.vote IS null
+		OR (pw_vote.vote = 'tellno' AND $div_no_vote = 0)
+		OR (pw_vote.vote = 'tellaye' AND $div_aye_vote = 0)
+	)
+) AS nvotesabsent,
+SUM(
+	(pw_dyn_dreamvote.vote = 'aye3' OR pw_dyn_dreamvote.vote = 'no3')
+	AND (
+		pw_vote.vote = 'both'
+		OR pw_vote.vote IS null
+		OR (pw_vote.vote = 'tellno' AND $div_no_vote = 0)
+		OR (pw_vote.vote = 'tellaye' AND $div_aye_vote = 0)
+	)
+) AS nvotesabsentstrong,
+SUM(pw_vote.vote IS NOT null) AS nvotesoverlap ";
 
 	# (no score from dreamMP absents or abstentions)
 

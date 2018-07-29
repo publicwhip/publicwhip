@@ -509,7 +509,7 @@ function pretty_user_name($db, $name, $text = null) {
     global $pwpdo;
     if (!$text)
         $text = $name;
-    $row = $pwpdo->get_single_row("select user_id from phpbb_users where username = ?",db_scrub($name));
+    $row = $pwpdo->get_single_row("select user_id from phpbb_users where username = ?",array(db_scrub($name)));
     if ($row)
         return "<a href=\"/forum/profile.php?mode=viewprofile&u=".$row['user_id']."\">$text</a>";
 

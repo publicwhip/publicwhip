@@ -67,6 +67,9 @@ function get_wiki_current_value($type, $params)
         trigger_error('Unknown wiki type');
         die();
     }
+    // these just prevent some notices when running php cgi scripts
+    $result = NULL;
+    $db = NULL;
     $query='select text_body, user_id, edit_date FROM pw_dyn_wiki_motion WHERE division_date=? AND division_number=? AND house=? order by wiki_id desc limit 1';
     $placeheld=array($params[0],$params[1],$params[2]);
     $allRows=$pwpdo->fetch_all_rows($query,$placeheld);

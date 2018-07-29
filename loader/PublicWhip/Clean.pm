@@ -33,11 +33,11 @@ sub fix_bothway_voters {
 
     my $sth = PublicWhip::DB::query(
         $dbh,
-"select a.mp_id, a.division_id, a.vote, b.vote from pw_vote as a, pw_vote as b where 
-        a.mp_id = b.mp_id and a.division_id = b.division_id and a.vote < b.vote"
-    );    # use < so only get the asymmetric half of entries
+"select mp_id,division_id,group_concat(vote order by vote) from pw_vote group by division_id,mp_id having count(*)>1"
+    );
     while ( my @data = $sth->fetchrow_array() ) {
-        my ( $mp_id, $division_id, $a_vote, $b_vote ) = @data;
+        my ( $mp_id, $division_id, $votes ) = @data;
+        my ( $a_vote, $b_vote ) = split /,/, $votes;
         if ( $a_vote ne "aye" || $b_vote ne "no" ) {
 # TODO: Reenable this warning, and work out what to do with them (I think they
 # may need merging together, and so be slightly preturbing attendance figures)
@@ -184,8 +184,7 @@ division_date, division_number"
     PublicWhip::Error::warn(
         "Database contains "
           . $sth->rows
-          . " member(s) who voted when they were not in the house!"
-          . "\n\n" . $nobody_query,
+          . " member(s) who voted when they were not in the house!",
         ""
       ) if $sth->rows;
 }

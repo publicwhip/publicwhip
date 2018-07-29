@@ -21,6 +21,7 @@ $db = new DB();
 
 $just_logged_in = do_login_screen();
 
+
 if (user_isloggedin()) # User logged in, show settings screen
 {
     $type = db_scrub($_GET["type"]);
@@ -35,16 +36,19 @@ if (user_isloggedin()) # User logged in, show settings screen
     $submit = db_scrub($_POST["submit"]);
     $rr = db_scrub($_GET["rr"]);
 
-    $db->query("select * from pw_division where division_date = '$params[0]' 
-        and division_number = '$params[1]' and house = '$params[2]'");
-    $division_details = $db->fetch_row_assoc();
+    // $db->query("select * from pw_division where division_date = '$params[0]' 
+    //    and division_number = '$params[1]' and house = '$params[2]'");
+    // $division_details = $db->fetch_row_assoc();
+    $query = "select * from pw_division where division_date = ?
+        and division_number = ? and house = ?";
+    $division_details = $pwpdo->get_single_row($query, array($params[0], $params[1], $params[2]));
     $prettydate = date("j M Y", strtotime($params[0]));
     $title = "Edit division description - " . $division_details['division_name'] . " - $prettydate - Division No. $params[1]";
     $debate_gid = str_replace("uk.org.publicwhip/debate/", "", $division_details['debate_gid']);
     $debate_gid = str_replace("uk.org.publicwhip/lords/", "", $debate_gid);
 
     if ($type == "motion") {
-        $motion_data = get_wiki_current_value($db, "motion", array($params[0], $params[1], $params[2]));
+        $motion_data = get_wiki_current_value("motion", array($params[0], $params[1], $params[2]));
         $prev_name = extract_title_from_wiki_text($motion_data['text_body']);
         $prev_description = extract_motion_text_from_wiki_text($motion_data['text_body']);
         $prev_description_editable = extract_motion_text_from_wiki_text_for_edit($motion_data['text_body']);
@@ -69,22 +73,26 @@ if (user_isloggedin()) # User logged in, show settings screen
                     "[url=http://$domain_name/division.php?date=".$division_details['division_date']."&number=".$division_details['division_number']."&house=".$division_details['house']."]".
                     $name_diff."[/url]\n[b]Description:[/b] ".$description_diff);
             }
-            $db->query_errcheck("insert into pw_dyn_wiki_motion
+//            $db->query_errcheck("insert into pw_dyn_wiki_motion
+//                (division_date, division_number, house, text_body, user_id, edit_date) values
+//                ('$params[0]', '$params[1]', '$params[2]', '".mysql_real_escape_string($newtext)."', '" . user_getid() . "', now())");
+           $pwpdo->query( "insert into pw_dyn_wiki_motion
                 (division_date, division_number, house, text_body, user_id, edit_date) values
-                ('$params[0]', '$params[1]', '$params[2]', '".mysql_real_escape_string($newtext)."', '" . user_getid() . "', now())");
+                (?, ?, ?, ?, ?, now())", array( $params[0], $params[1], $params[2], $newtext, user_getid()));
+
             audit_log("Edited $type wiki text $params[0] $params[1] $params[2]");
             if ($type == 'motion') {
-                notify_motion_updated($db, $params[0], $params[1], $params[2]);
+                notify_motion_updated($params[0], $params[1], $params[2]);
             }
         }
-        header("Location: ". $rr);
+        header("Location: http://www.publicwhip.org.uk". $rr);
         exit;
     }
     else
     {
         pw_header();
 
-        $values = get_wiki_current_value($db, $type, $params);
+        $values = get_wiki_current_value($type, $params);
 
         if ($type == 'motion') {
 ?>
@@ -122,7 +130,7 @@ if (user_isloggedin()) # User logged in, show settings screen
         <td width="64%" valign="top">
 
         <P>
-        <FORM ACTION="<?php echo $REQUEST_URI?>" METHOD="POST">
+        <FORM ACTION="<?php echo $_SERVER['REQUEST_URI'] ?>" METHOD="POST">
         <B>Division title:</b> <BR><INPUT TYPE="TEXT" NAME="newtitle" style="width: 100%" VALUE="<?php echo html_scrub(str_replace("&#8212;", "-", $prev_name))?>" SIZE="50" MAXLENGTH="250">
         <P><B>Division description:</b> <textarea name="newdescription" style="width: 100%" rows="25" cols="45"><?php echo html_scrub($prev_description_editable)?></textarea>
         <p>

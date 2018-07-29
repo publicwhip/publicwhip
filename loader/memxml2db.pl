@@ -2,8 +2,6 @@
 use strict;
 use lib "PublicWhip";
 
-# $Id: memxml2db.pl,v 1.25 2010/08/06 16:25:19 publicwhip Exp $
-
 # Convert all-members.xml and all-lords.xml into the database format for Public
 # Whip website
 
@@ -15,6 +13,8 @@ use lib "PublicWhip";
 use XML::Twig;
 use HTML::Entities;
 use Data::Dumper;
+use File::Slurp;
+use JSON;
 
 use PublicWhip::Config;
 my $members_location = $PublicWhip::Config::members_location;
@@ -22,18 +22,19 @@ my $members_location = $PublicWhip::Config::members_location;
 use PublicWhip::Error;
 use PublicWhip::DB;
 my $dbh = PublicWhip::DB::connect();
-my $sec;
-my $min;
-my $hour;
-my $mday;
-my $mon;
-my $year;
-($sec,$min,$hour,$mday,$mon,$year)=localtime(time);
-printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"memxml2db","Mapping gid to internal mp_ids";
+
+sub debug {
+    my $log = shift;
+    my ($sec,$min,$hour,$mday,$mon,$year) = localtime(time);
+    printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"memxml2db", $log;
+}
+
+debug("Mapping gid to internal mp_ids");
 
 # Map from gid to the pw_mp.mp_id internal Public Whip ids, so we reload
 # table with same new ids
-our $gid_to_internal; 
+our $gid_to_internal;
+our (%organizations, %posts, %people);
 my $last_mp_id = 0;
 my $sth = PublicWhip::DB::query($dbh, "select mp_id, gid from pw_mp");
 while ( my ($mp_id, $gid) = $sth->fetchrow_array() ) {
@@ -41,77 +42,77 @@ while ( my ($mp_id, $gid) = $sth->fetchrow_array() ) {
     $last_mp_id = $mp_id if ($mp_id > $last_mp_id);
 }
 
-($sec,$min,$hour,$mday,$mon,$year)=localtime(time);
-printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"memxml2db","Deleting tables";
+debug("Deleting tables");
 # We completely rebuild these two tables
 $sth = PublicWhip::DB::query($dbh, "delete from pw_moffice");
 $sth = PublicWhip::DB::query($dbh, "delete from pw_constituency");
 
 my %membertoperson;
-($sec,$min,$hour,$mday,$mon,$year)=localtime(time);
-printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"memxml2db","Setting up twig";
-my $twig = XML::Twig->new(
-    twig_handlers => { 
-            'constituency' => \&loadcons, 
-            'member' => \&loadmember, 
-            'lord' => \&loadmember, 
-            'member_sp' => \&loadmember,
-            'person' => \&loadperson, 
-            'moffice' => \&loadmoffice 
-        }, 
-    output_filter => 'safe');
-($sec,$min,$hour,$mday,$mon,$year)=localtime(time);
-printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"memxml2db","Parsing constituencies.xml";
-$twig->parsefile("$members_location/constituencies.xml");
-($sec,$min,$hour,$mday,$mon,$year)=localtime(time);
-printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"memxml2db","Parsing sp-constituencies.xml";
-$twig->parsefile("$members_location/sp-constituencies.xml");
-($sec,$min,$hour,$mday,$mon,$year)=localtime(time);
-printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"memxml2db","Parsing people.xml";
-$twig->parsefile("$members_location/people.xml");
-($sec,$min,$hour,$mday,$mon,$year)=localtime(time);
-printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"memxml2db","Parsing ministers.xml";
-$twig->parsefile("$members_location/ministers.xml");
-($sec,$min,$hour,$mday,$mon,$year)=localtime(time);
-printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"memxml2db","Parsing all-members.xml";
-$twig->parsefile("$members_location/all-members.xml");
-($sec,$min,$hour,$mday,$mon,$year)=localtime(time);
-printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"memxml2db","Parsing all-members-2010.xml";
-$twig->parsefile("$members_location/all-members-2010.xml");
-($sec,$min,$hour,$mday,$mon,$year)=localtime(time);
-printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"memxml2db","Parsing peers-ucl.xml";
-$twig->parsefile("$members_location/peers-ucl.xml");
-($sec,$min,$hour,$mday,$mon,$year)=localtime(time);
-printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"memxml2db","Parsing sp-members.xml";
-$twig->parsefile("$members_location/sp-members.xml");
+debug("Parsing constituencies.json");
+loadcons('commons', $members_location. '/constituencies.json');
 
-($sec,$min,$hour,$mday,$mon,$year)=localtime(time);
-printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"memxml2db","Deleting cached";
+debug("Parsing sp-constituencies.json");
+loadcons('scotland', $members_location. '/sp-constituencies.json');
+
+debug("Parsing people.json");
+loadpeople();
+
+debug("Parsing ministers.xml");
+loadmoffice();
+
+debug("Deleting cached");
 # Delete things left that shouldn't be from this table
 foreach my $gid (keys %$gid_to_internal) {
     $sth = PublicWhip::DB::query($dbh, "delete from pw_mp where gid = '$gid'");
 }
 
-sub loadperson
+sub loadpeople
 {
-	my ($twig, $person) = @_;
-    my $curperson = $person->att('id');
-
-    for (my $office = $person->first_child('office'); $office;
-        $office = $office->next_sibling('office'))
-    {
-        $membertoperson{$office->att('id')} = $curperson;
+    my $j = decode_json(read_file($members_location. '/people.json'));
+    foreach (@{$j->{persons}}) {
+        $people{$_->{id}} = $_;
+    }
+    foreach (@{$j->{organizations}}) {
+        $organizations{$_->{id}} = $_;
+    }
+    foreach (@{$j->{posts}}) {
+        $posts{$_->{id}} = $_;
+    }
+    foreach (@{$j->{memberships}}) {
+        loadmember($_);
     }
 }
 
 sub loadmember
-{ 
-    my ($twig, $memb) = @_;
+{
+    my $memb = shift;
 
-    my $house = $memb->att('house');
-    $house = 'scotland' if not $house;
-    # print "house: " . $house . "\n";
-    my $gid = $memb->att('id');
+    my $fromdate = $memb->{start_date} || '0000-00-00';
+    $fromdate .= '-00-00' if length($fromdate) == 4;
+    my $todate = $memb->{end_date} || '9999-12-31';
+    $todate .= '-00-00' if length($todate) == 4;
+
+    my $org_slug;
+    if ($memb->{post_id}) {
+        $org_slug = $posts{$memb->{post_id}}{organization_id};
+    } else {
+        $org_slug = $memb->{organization_id};
+    }
+    return unless $org_slug; # A redirected membership
+
+    my $house = '';
+    if ( $org_slug eq 'house-of-commons' ) {
+        $house = 'commons';
+    } elsif ( $org_slug eq 'scottish-parliament' ) {
+        $house = 'scotland';
+    } elsif ( $org_slug eq 'house-of-lords' ) {
+        $house = 'lords';
+    } else {
+        # $org_slug will be 'northern-ireland-assembly' or 'crown'
+        return;
+    }
+
+    my $gid = $memb->{id};
     if ($gid =~ m#uk.org.publicwhip/member/#) {
         die unless ($house eq 'commons' || $house eq 'scotland');
     } elsif ($gid =~ m#uk.org.publicwhip/lord/#) {
@@ -125,21 +126,49 @@ sub loadmember
     $id =~ s#uk.org.publicwhip/member/##;
     $id =~ s#uk.org.publicwhip/lord/##;
 
-    my $person = $membertoperson{$memb->att('id')};
-    if (!defined($person)) {
-	    die "mp " . $id . " " . $memb->att('firstname') . " " . $memb->att('lastname') . " has no person" if $house eq 'commons';
-	    die "lord " . $id . " " . $memb->att('lordofname') . " has no person" if $house eq 'lords';
-	    die "unknown $id has no person";
-    }
-    $person =~ s#uk.org.publicwhip/person/##;
+    (my $person_id = $memb->{person_id}) =~ s#uk.org.publicwhip/person/##;
+    my $person = $people{$memb->{person_id}};
+    die "$house $id person ID $memb->{person_id} has no person" unless $person;
 
-    my $party = $memb->att('party');
-    my $title = $memb->att('title');
-    my $firstname = $memb->att('firstname');
-    my $lastname = $memb->att('lastname');
-    my $constituency = $memb->att('constituency');
-    my $fromdate = $memb->att('fromdate');
-    my $todate = $memb->att('todate');
+    my @names = grep { $_->{note} eq 'Main' } @{$person->{other_names}};
+    @names = grep { ($_->{start_date} || '0000-00-00') le $todate && ($_->{end_date} || '9999-12-31') ge $todate } @names;
+    $memb->{name} = $names[0];
+
+    my $last_name_field = $org_slug eq 'house-of-lords' ? 'lordname' : 'family_name';
+    my $constituency = '';
+    if ($org_slug eq 'house-of-lords') {
+        $constituency = $memb->{name}{lordofname};
+    } elsif ($org_slug ne 'crown') {
+        $constituency = $posts{$memb->{post_id}}{area}{name};
+    }
+
+    my $party = $memb->{on_behalf_of_id} ? $organizations{$memb->{on_behalf_of_id}}{name} : '';
+    $party = Encode::encode('iso-8859-1', $party);
+
+    # party names are used hard coded in various places in code so we need to use
+    # the old style ones
+    if ( $party eq 'Conservative' ) {
+        $party = 'Con';
+    } elsif ( $party eq 'Labour' or $party eq 'Labour/Co-operative' ) {
+        $party = 'Lab';
+    } elsif ( $party eq 'Liberal Democrat' ) {
+        $party = 'LDem';
+    } elsif ( $party eq 'Scottish National Party' ) {
+        $party = 'SNP';
+    } elsif ( $party eq 'Social Democratic and Labour Party' ) {
+        $party = 'SDLP';
+    } elsif ( $party eq 'Plaid Cymru' ) {
+        $party = 'PC';
+    } elsif ( $party eq 'Speaker' ) {
+        $party = 'SPK';
+    } elsif ( $party =~ /Sinn/ ) {
+        $party = 'SF';
+    }
+
+    my $title = $memb->{name}->{honorific_prefix} || '';
+    my $firstname = $memb->{name}->{given_name};
+    my $lastname = $memb->{name}->{$last_name_field};
+
     if ($todate le '1997-04-08') {
         #print "Ignoring entry older than 1997 election for $firstname $lastname $fromdate $todate\n";
         return;
@@ -148,20 +177,19 @@ sub loadmember
         print "Ignoring entry with doubly incomplete date for $firstname $lastname $fromdate $todate\n";
         return;
     }
-    my $fromwhy = $memb->att('fromwhy');
-    my $towhy = $memb->att('towhy');
+    my $fromwhy = $memb->{start_reason} || '';
+    my $towhy = $memb->{end_reason} || ($todate eq '9999-12-31' && $org_slug ne 'house-of-lords' ? 'still_in_office' : '');
     if ($house eq 'lords') {
-        if (!$memb->att('lordname')) {
+        if (!$memb->{name}->{lordname}) {
             $title = "The " . $title;
         }
-        $firstname = $memb->att('lordname');
-        if ($memb->att('lordofname')) {
-            $lastname = "of " . $memb->att('lordofname');
+        $firstname = $memb->{name}->{lordname};
+        if ($memb->{name}->{lordofname}) {
+            $lastname = "of " . $memb->{name}->{lordofname};
         } else {
             $lastname = "";
         }
         $constituency = "";
-        $party = $memb->att('affiliation');
         $party = 'LDem' if ($party eq 'Dem');
         $fromwhy = 'unknown'; # TODO
         $towhy = 'unknown';
@@ -169,11 +197,16 @@ sub loadmember
             $todate = "9999-12-31"; # TODO
         }
     }
-    $party = 'Lab' if ($party eq 'Lab/Co-op');
 
     # We encode entities as e.g. &Ouml;, as otherwise non-ASCII characters
     # get lost somewhere between Perl, the database and the browser.
     my $sth = PublicWhip::DB::query($dbh, "delete from pw_mp where gid = '$gid'");
+    if (!defined $firstname) {
+        $firstname = "[Missing first name for ".$id."]"; # rab
+    }
+    if (!defined $lastname) {
+        $lastname = "[Missing last name for ".$id."]"; # rab
+    }
     $sth = PublicWhip::DB::query($dbh, "insert into pw_mp
         (first_name, last_name, title, constituency, party, house,
         entered_house, left_house, entered_reason, left_reason, 
@@ -190,85 +223,72 @@ sub loadmember
             $fromwhy, 
             $towhy, 
             $id,
-            $person,
+            $person_id,
             $gid,
         );
 
     # Store deleted
     delete $gid_to_internal->{$gid};
 
-    $twig->purge;
 }
 
 sub loadmoffice
 { 
-	my ($twig, $moff) = @_;
+    foreach ('ministers.json', 'ministers-2010.json') {
+        my $j = decode_json(read_file($members_location . $_));
+        foreach (@{$j->{organizations}}) {
+            $organizations{$_->{id}} = $_->{name};
+        }
+        foreach (@{$j->{memberships}}) {
+            (my $person = $_->{person_id}) =~ s#uk.org.publicwhip/person/##;
+            my $position = $_->{role} || 'Member';
+            my $dept = $organizations{$_->{organization_id}} || die $!;
+            $dept = '' if $dept eq 'House of Commons';
+            my $end_date = $_->{end_date} || '9999-12-31';
 
-    my $mofficeid = $moff->att('id');
-    $mofficeid =~ s#uk.org.publicwhip/moffice/##;
-    my $mpid = $moff->att('matchid');
-    if (!$mpid) {
-        return;
+            my $responsibility = ''; # $_->{role} ? $_->{role} : '';
+            my $sth = PublicWhip::DB::query($dbh, "insert into pw_moffice
+                (dept, position, responsibility,
+                from_date, to_date, person) values
+                (?, ?, ?, ?, ?, ?)",
+                encode_entities($dept),
+                encode_entities($position),
+                encode_entities($responsibility),
+                $_->{start_date},
+                $end_date,
+                $person,
+                );
+        }
     }
-    $mpid =~ s#uk.org.publicwhip/member/##;
-
-    my $person = $membertoperson{$moff->att('matchid')};
-    die "mp " . $mpid . " " . $moff->att('name') . " has no person" if !defined($person);
-    $person =~ s#uk.org.publicwhip/person/##;
-
-    # We encode entities as e.g. &Ouml;, as otherwise non-ASCII characters
-    # get lost somewhere between Perl, the database and the browser.
-    my $responsibility = $moff->att('responsibility') ? $moff->att('responsibility') : '';
-    my $sth = PublicWhip::DB::query($dbh, "insert into pw_moffice 
-        (moffice_id, dept, position, responsibility,
-        from_date, to_date, person) values
-        (?, ?, ?, ?, ?, ?, ?)", 
-        $mofficeid,
-        encode_entities($moff->att('dept')), 
-        encode_entities($moff->att('position')), 
-        encode_entities($responsibility), 
-        $moff->att('fromdate'), 
-        $moff->att('todate'), 
-        $person,
-        );
 }
 
 sub loadcons
-{ 
-	my ($twig, $cons) = @_;
+{
+    my $house = shift;
+    my $file = shift;
+    my $j = decode_json(read_file($file));
+    foreach my $cons (@$j) {
 
-    my $consid = $cons->att('id');
-    $consid =~ s#uk.org.publicwhip/cons/##;
+        (my $consid = $cons->{id}) =~ s#uk.org.publicwhip/cons/##;
 
-    my $parliament = $cons->att('parliament');
-    my $house;
-    if (defined($parliament) && ($parliament eq 'edinburgh')) {
-        $house = 'scotland';
-    } else {
-        $house = 'commons';
-    }
+        my $start_date = $cons->{start_date};
+        $start_date .= '-00-00' if length($start_date) == 4;
+        my $end_date = $cons->{end_date} || '9999-12-31';
+        $end_date .= '-00-00' if length($end_date) == 4;
 
-    my $main_name = 1;
-    for (my $name = $cons->first_child('name'); $name; $name = $name->next_sibling('name')) {
-	my $text = encode_entities($name->att('text'));
-	
-	# No idea why this isn't coming in from XML at unicode on sphinx
-	# (it works on my laptop - Francis, 2005-10-12)
-	$text =~ s/Ynys M&Atilde;&acute;n/Ynys M&ocirc;n/;
-
-        # We encode entities as e.g. &Ouml;, as otherwise non-ASCII characters
-        # get lost somewhere between Perl, the database and the browser.
-        my $sth = PublicWhip::DB::query($dbh, "insert into pw_constituency
-            (cons_id, name, main_name, from_date, to_date, house) values
-            (?, ?, ?, ?, ?, ?)",
-            $consid,
-            $text, 
-            $main_name,
-            $cons->att('fromdate'), 
-            $cons->att('todate'), 
-            $house
+        my $main_name = 1;
+        foreach my $name (@{$cons->{names}}) {
+            my $sth = PublicWhip::DB::query($dbh, "insert into pw_constituency
+                (cons_id, name, main_name, from_date, to_date, house) values
+                (?, ?, ?, ?, ?, ?)",
+                $consid,
+                encode_entities(Encode::encode('iso-8859-1', $name)),
+                $main_name,
+                $start_date,
+                $end_date,
+                $house
             );
-        $main_name = 0;
+            $main_name = 0;
+        }
     }
 }
-

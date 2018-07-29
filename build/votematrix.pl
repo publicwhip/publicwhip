@@ -53,7 +53,7 @@ sub do_one_file {
     print METADATA "file created: " . scalar localtime() . "by http://www.publicwhip.org.uk/\n";
     # Get ids of MPs
     my $limit = "";
-    printf "[%4d-%02d-%02d %02d:%02d:%02d] %s: %s\n",$year+1900,$mon+1,$mday,$hour,$min,$sec,"votematrix","Processing $outfile\n";
+    printf "* %s: %s\n","votematrix","Processing $outfile";
     my $sql="select pw_mp.mp_id, pw_mp.first_name, pw_mp.last_name, pw_mp.party from pw_mp, pw_cache_mpinfo where
         pw_mp.mp_id = pw_cache_mpinfo.mp_id and $where 
         order by pw_mp.last_name, pw_mp.first_name, pw_mp.constituency $limit";

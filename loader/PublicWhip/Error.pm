@@ -32,7 +32,7 @@ sub printout {
     my $location = shift;
 
     print $stubid, " $msg";
-    print " - " . $location if $location ne "";
+    print " - " . $location if $location;
     print "\n";
 }
 

@@ -106,8 +106,9 @@ function notify_dream_mp_updated($db, $dreamid) {
     $db->query("delete from pw_cache_dreaminfo where dream_id = '$dreamid'"); 
 }
 # ... when piece of motion text is edited
-function notify_motion_updated($db, $division_date, $division_number, $house) {
-    $db->query("delete from pw_cache_divwiki where division_date = '$division_date'
-        and division_number = '$division_number' and house = '$house'"); 
+function notify_motion_updated($division_date, $division_number, $house) {
+    global $pwpdo;
+    $pwpdo->query("delete from pw_cache_divwiki where division_date = ?
+        and division_number = ? and house = ?", array($division_date, $division_number, $house)); 
 }
 

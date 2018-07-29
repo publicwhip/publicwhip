@@ -20,28 +20,23 @@ echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Starting with from date of $
 
 # Grab new scraped XML files from TheyWorkForYou
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Fetching divisions"
-rsync --recursive ukparse.kforge.net::parldata/scrapedxml/divisionsonly /home/publicwhip/parldata/scrapedxml
+rsync -rlpt data.theyworkforyou.com::parldata/scrapedxml/divisionsonly /home/publicwhip/parldata/scrapedxml
 
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Fetching lords"
-rsync --recursive ukparse.kforge.net::parldata/scrapedxml/lordsdivisionsonly /home/publicwhip/parldata/scrapedxml
+rsync -rlpt data.theyworkforyou.com::parldata/scrapedxml/lordsdivisionsonly /home/publicwhip/parldata/scrapedxml
 
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Fetching sp"
-rsync --recursive ukparse.kforge.net::parldata/scrapedxml/sp /home/publicwhip/parldata/scrapedxml
+rsync -rlpt data.theyworkforyou.com::parldata/scrapedxml/sp /home/publicwhip/parldata/scrapedxml
 
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Fetching sp-motions"
-rsync --recursive ukparse.kforge.net::parldata/scrapedxml/sp-motions /home/publicwhip/parldata/scrapedxml
+rsync -rlpt data.theyworkforyou.com::parldata/scrapedxml/sp-motions /home/publicwhip/parldata/scrapedxml
 
 chmod -R a+r /home/publicwhip/parldata
 
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Updating parlimentary parser"
 # Update members files and the like
 cd ~/parlparse
-svn -q update
-
-
-# Update this loader code and similar
-cd ~/publicwhip-live/
-# cvs -Q update -dP
+# git pull -q
 
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Loading list of members"
 # Load new list of members and ministers
@@ -88,7 +83,7 @@ echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Votematrix"
 
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Copying across ministers"
 # Copy across ministers file (used by minwhirl)
-cp ~/parlparse/members/ministers.xml ~/www.publicwhip.org.uk/docs/data/
+cp ~/parlparse/members/ministers.json ~/www.publicwhip.org.uk/docs/data/
 cp ~/publicwhip-live/*.txt ~/www.publicwhip.org.uk/docs/data/
 chmod a+r ~/www.publicwhip.org.uk/docs/data/*
 
@@ -103,4 +98,8 @@ echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Interesting divisions"
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: All divisions"
 ./alldivisions2rss.pl > $RSSDEST/alldivisions.xml
 
-echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S) dailyupdate: Complete"
+cd ~/publicwhip-live/build
+echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: popolo division data"
+./generate_popolo_json.php
+
+echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Complete"

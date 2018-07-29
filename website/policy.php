@@ -114,11 +114,13 @@ require_once "DifferenceEngine.inc";
 
 # edit definition needs to check login
 if ($dismode["editdefinition"]) {
-    pw_header();
-    print '<h1>Sorry, edit definitions are currently disabled</h1>';
-    pw_footer();
-    disabled('policy.php editdefinition');
-    die();
+    if ( $_SERVER['REMOTE_ADDR'] != '46.43.39.75' && $_SERVER['REMOTE_ADDR'] != '46.43.39.78'  && $_SERVER['HTTP_CF_CONNECTING_IP'] != '46.43.39.75' && $_SERVER['HTTP_CF_CONNECTING_IP'] != '46.43.39.78' ) {
+        pw_header();
+        print '<h1>Sorry, edit definitions are currently disabled</h1>';
+        pw_footer();
+        disabled('policy.php editdefinition');
+        die();
+    }
         $just_logged_in = do_login_screen();
         if (!user_isloggedin()) {
             login_screen();
@@ -197,7 +199,7 @@ if ($dismode["editdefinition"]) {
         }
         if ($ok)
         {
-            header("Location: /policy.php?id=$dreamid\n");
+            header("Location: policy.php?id=$dreamid\n");
             exit;
         }
     }
@@ -206,6 +208,9 @@ if ($dismode["editdefinition"]) {
     $thispage = "policy.php?id=$dreamid"; 
     $second_links = dismodes_to_second_links($thispage, $dismodes, $tpsort, $display);
     $second_type = "tabs";
+    if ( $_SERVER['REMOTE_ADDR'] == '46.43.39.75' || $_SERVER['REMOTE_ADDR'] == '46.43.39.78' || $_SERVER['HTTP_CF_CONNECTING_IP'] == '46.43.39.75' || $_SERVER['HTTP_CF_CONNECTING_IP'] == '46.43.39.78'  ) {
+        $second_type = "";
+    }
 
     pw_header();
 
@@ -215,11 +220,13 @@ if ($dismode["editdefinition"]) {
 	$clashesonsave = -1; // signifies no saving done
 	if ($_GET["savevotes"] && $bAggregateEditable && $bAggregate)
 	{
-        pw_header();
-        print '<h1>Sorry, saving votes are currently disabled</h1>';
-        pw_footer();
-        disabled('policy.php savevotes');
-        exit();
+        if ( $_SERVER['REMOTE_ADDR'] != '46.43.39.75' && $_SERVER['REMOTE_ADDR'] != '46.43.39.78' && $_SERVER['HTTP_CF_CONNECTING_IP'] != '46.43.39.75' && $_SERVER['HTTP_CF_CONNECTING_IP'] != '46.43.39.78' ) {
+            pw_header();
+            print '<h1>Sorry, saving votes are currently disabled</h1>';
+            pw_footer();
+            disabled('policy.php savevotes');
+            exit();
+        }
 		print "<h2>THIS IS WHERE WE SAVE THE VOTES INTO THE POLICY</h2>.\n";
 
 		// remove superfluous entries
@@ -311,11 +318,13 @@ if ($dismode["editdefinition"]) {
     }
 
 	if ($dismode["discussion"]) {
-        pw_header();
-        print '<h1>Sorry, discussions currently disabled</h1>';
-        pw_footer();
-        disabled('policy.php discussion');
-        exit();
+        if ( $_SERVER['REMOTE_ADDR'] != '46.43.39.75' && $_SERVER['REMOTE_ADDR'] != '46.43.39.78' && $_SERVER['HTTP_CF_CONNECTING_IP'] != '46.43.39.75' && $_SERVER['HTTP_CF_CONNECTING_IP'] != '46.43.39.78' ) {
+            pw_header();
+            print '<h1>Sorry, discussions currently disabled</h1>';
+            pw_footer();
+            disabled('policy.php discussion');
+            exit();
+        }
         $discuss_url = dream_post_forum_link($db, $dreamid);
         if (!$discuss_url) {
             // First time someone logged in comes along, add policy to the forum
@@ -335,11 +344,13 @@ if ($dismode["editdefinition"]) {
     }
 
 	if ($dismode["editdefinition"]) {
-        pw_header();
-        print '<h1>Sorry, edit definition currently disabled</h1>';
-        pw_footer();
-        disabled('policy.php editdefinition');
-        exit();
+        if ( $_SERVER['REMOTE_ADDR'] != '46.43.39.75' && $_SERVER['REMOTE_ADDR'] != '46.43.39.78' && $_SERVER['HTTP_CF_CONNECTING_IP'] != '46.43.39.75' && $_SERVER['HTTP_CF_CONNECTING_IP'] != '46.43.39.78' ) {
+            pw_header();
+            print '<h1>Sorry, edit definition currently disabled</h1>';
+            pw_footer();
+            disabled('policy.php editdefinition');
+            exit();
+        }
         if (!user_getid()) {
             print "Error, expected to be logged in.";
             exit;
@@ -395,11 +406,13 @@ if ($dismode["editdefinition"]) {
     // XXX this is not really used
     if ($dismode["aggregate"] == "fulltable")
 	{
-        pw_header();
-        print '<h1>Sorry, full table aggregate stats currently disabled</h1>';
-        pw_footer();
-        disabled('policy.php full table aggregate stats');
-        exit();
+        if ( $_SERVER['REMOTE_ADDR'] != '46.43.39.75' && $_SERVER['REMOTE_ADDR'] != '46.43.39.78' && $_SERVER['HTTP_CF_CONNECTING_IP'] != '46.43.39.75' && $_SERVER['HTTP_CF_CONNECTING_IP'] != '46.43.39.78' ) {
+            pw_header();
+            print '<h1>Sorry, full table aggregate stats currently disabled</h1>';
+            pw_footer();
+            disabled('policy.php full table aggregate stats');
+            exit();
+        }
 		// changed vote
 		if (mysql_real_escape_string($_POST["submiteditpolicy"]))
         {
