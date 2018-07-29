@@ -9,7 +9,10 @@
 
 package PublicWhip::Clean;
 use strict;
+
+use lib ".";
 use PublicWhip::Error;
+
 
 sub erase_duff_divisions {
     my $dbh = shift;
@@ -77,7 +80,7 @@ sub fix_bothway_voters {
         }
     }
     PublicWhip::Error::log( "Fixed up " . $sth->rows . " bothway votes",
-        "", ERR_USEFUL )
+        "", PublicWhip::Error::ERR_USEFUL )
       if ( $sth->rows > 0 );
 }
 

@@ -15,9 +15,11 @@ $pw_database = "tpw";
 $pw_cache_enable = false;
 $pw_cache_top = "/blah/pwcache";
 
+# use logic to set adminAllowed to true for restricted IP addresses etc.
+$adminAllowed = false;
+# api key for mapit.mysociety.org
+
 # Authentication value - only needed for publicwhip.org.uk itself
 $hidden_hash_var=''; 
 
 define('HIDDEN_HASH_VAR', $hidden_hash_var);
-
-?>

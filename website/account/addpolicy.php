@@ -1,4 +1,4 @@
-<?php require_once "../common.inc";
+<?php require_once __DIR__."/../common.inc";
 
 # $Id: addpolicy.php,v 1.15 2006/10/23 17:16:38 publicwhip Exp $
 
@@ -7,11 +7,11 @@
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
 
-require_once "../database.inc";
+require_once __DIR__."/../database.inc";
 require_once "user.inc";
-require_once "../db.inc";
-require_once "../cache-tools.inc";
-require_once "../dream.inc";
+require_once __DIR__."/../db.inc";
+require_once __DIR__."/../cache-tools.inc";
+require_once __DIR__."/../dream.inc";
 
 $just_logged_in = do_login_screen();
 
@@ -121,7 +121,7 @@ if (user_isloggedin())
 		doing the same thing as you.</li>
 
 		</ul>
-<?
+<?php
 
     }
 
@@ -146,7 +146,6 @@ if (user_isloggedin())
         <p><INPUT TYPE="SUBMIT" NAME="submit" VALUE="Make Policy">
         </FORM>
 
-        <p>If you like you can <a href="/forum/viewforum.php?f=1">discuss policies on our forum</a>.
 
     <?php
     }
@@ -156,5 +155,3 @@ else
 {
     login_screen();
 }
-?>
-

@@ -1,4 +1,4 @@
-<?php require_once "../common.inc";
+<?php require_once __DIR__."/../common.inc";
 
 # $Id: logout.php,v 1.9 2005/11/01 01:23:17 frabcus Exp $
 
@@ -7,7 +7,7 @@
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
 
-require_once "../database.inc";
+require_once __DIR__."/../database.inc";
 require_once "user.inc";
 
 if (user_isloggedin()) {

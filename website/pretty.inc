@@ -138,6 +138,9 @@ function random_big_word($phrase)
 #    print "<p>words: "; foreach ($words as $word) { print "'$word';"; }
     $lesswords = array_filter($words, "interesting_word");
 #    print "<p>lesswords: "; foreach ($lesswords as $word) { print "'$word';"; }
+    if (count($lesswords)<1) {
+        return '';
+    }
     return $lesswords[array_rand($lesswords)];
 }
 
@@ -174,7 +177,7 @@ function searchtip_random_topic($db)
     if (!$row) {
     	return "*no divisions*";
     }
-    $random_topic = random_big_word($row[0]);
+    $random_topic = random_big_word($row['division_name']);
     if ($random_topic == "")
         $random_topic = "Trade";
     return $random_topic;
@@ -510,8 +513,6 @@ function pretty_user_name($db, $name, $text = null) {
     if (!$text)
         $text = $name;
     $row = $pwpdo->get_single_row("select user_id from phpbb_users where username = ?",array(db_scrub($name)));
-    if ($row)
-        return "<a href=\"/forum/profile.php?mode=viewprofile&u=".$row['user_id']."\">$text</a>";
 
     return $name;
 }

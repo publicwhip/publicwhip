@@ -1,4 +1,4 @@
-<?php require_once "../common.inc";
+<?php require_once __DIR__."/../common.inc";
 
 # $Id: lostpass.php,v 1.9 2006/03/06 19:09:56 frabcus Exp $
 
@@ -7,7 +7,7 @@
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
 
-require_once "../database.inc";
+require_once __DIR__."/../database.inc";
 require_once "user.inc";
 
 $email=mysql_real_escape_string($_POST["email"]);

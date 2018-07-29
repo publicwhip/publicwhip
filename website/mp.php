@@ -1,4 +1,5 @@
-<?php require_once "common.inc";
+<?php
+require_once __DIR__.'/common.inc';
     # $Id: mp.php,v 1.146 2010/03/12 12:26:46 publicwhip Exp $
 
     # The Public Whip, Copyright (C) 2003 Francis Irving and Julian Todd
@@ -49,12 +50,8 @@
 	# Second is another mp (by person), a dream mp, or a/the party
 	$voter1attr = get_mpid_attr_decode($db, $db2, "", ($voter2type == "dreammp" ? $voter2attr : null));
 	if ($voter1attr == null) {
-        $title = "MP/Lord not found";
-        pw_header();
-		print "<p>No MP or Lord found. If you entered a postcode, please make
-        sure it is correct.  Or you can <a href=\"/mps.php\">browse
-        all MPs</a> or <a href=\"/mps.php?house=lords\">browse all Lords</a>.";
-        pw_footer();
+		pw_handle_404('MP/Lord not found','No MP or Lord found. If you entered a postcode, please make sure it is correct.');
+		exit();
         exit;
     }
 	$voter1type = "mp";
@@ -71,7 +68,7 @@
 	# (and whether the first is a constituency or a person)
 	# select a mode for what is displayed
 	# code for the 0th mp def, if it is there.
-    $voter1link = "mp.php?";
+    $voter1link = "/mp.php?";
     if ($voter1attr["bmultiperson"]) {
         $voter1link .= "mpc=".urlencode($mpprop['constituency']);
         $voter1link .= "house=".urlencode($mpprop['house']);
@@ -84,12 +81,12 @@
 	if ($voter2type == "dreammp")
 	{
 		$thispagesettings = "dmp=$voter2";
-	    $voter2link = "policy.php?id=$voter2";
+	    $voter2link = "/policy.php?id=$voter2";
 	}
 	else if ($voter2type == "person")
 	{
 		$thispagesettings = $voter2["mpprop"]["mpanchor2"];
-	    $voter2link = "mp.php?". $voter2["mpprop"]["mpanchor"];
+	    $voter2link = "/mp.php?". $voter2["mpprop"]["mpanchor"];
 	}
 	$thispage = $voter1link; 
 	if ($thispagesettings != "")
@@ -368,13 +365,15 @@
                 print "<b>".$currently_minister[$i]."</b>"; 
             }
             print "</p>"; 
-        }
+        } else {
+	    	print '<p><b>'.$mpprop['name'].'</b></p>';
+		}
 
         print "<p><em>Note:</em> our records only go back to 1997 for the Commons and 2001 for the Lords (<a href=\"/faq.php#timeperiod\">more details</a>).";
 
 	    seat_summary_table($voter1attr['mpprops'], $voter1attr['bmultiperson'], ($all_same_cons ? false : true), true, $thispagesettings);
 
-        if ($voter2type == "party")
+        if ($voter2type === "party")
 	    {
 		    print "<h2><a name=\"exlinks\">External Links</a></h2>\n";
             print "<ul>\n";
@@ -382,14 +381,27 @@
 			print "<li>See <strong>".$mpprop["name"]."</strong>'s Parliamentary speeches at: ";
 			print "<a href=\"http://www.theyworkforyou.com/mp/?m=".$mpprop["mpid"]."\">TheyWorkForYou.com</a></li>\n";
 
-            if ($mpprop['house'] == 'commons') 
+            if ($mpprop['house'] === 'commons')
             {
                 # can we link directly? no - you need postcode
                 print "<li>Contact your MP for free at: <a href=\"http://www.writetothem.com\">WriteToThem.com</a></li>\n";
 
                 print "<li>Form a long term relationship with your MP: <a href=\"http://www.hearfromyourmp.com\">HearFromYourMP.com</a></li>\n";
 
-                include $toppath . "ecdonations.inc";
+    $ecconstituency = $mpprop['constituency'];
+    $ecconstituency = preg_replace('# &amp; .*#', '', $ecconstituency);
+    $ecconstituency = preg_replace('# and .*#', '', $ecconstituency);
+				print '<li>Search for <a href="http://search.electoralcommission.org.uk/?currentPage=1&rows=10&query='.
+					urlencode($ecconstituency).
+					'&sort=AcceptedDate&order=desc&tab=1&open=filter&et=pp&et=ppm&et=tp&et=perpar&et=rd'.
+					'&isIrishSourceYes=true&isIrishSourceNo=true&prePoll=false&postPoll=true&register=gb'.
+					'&register=ni&register=none&optCols=Register&optCols=CampaigningName'.
+					'&optCols=AccountingUnitsAsCentralParty&optCols=IsSponsorship&optCols=IsIrishSource'.
+					'&optCols=RegulatedDoneeType&optCols=CompanyRegistrationNumber&optCols=Postcode'.
+					'&optCols=NatureOfDonation&optCols=PurposeOfVisit&optCols=DonationAction'.
+					'&optCols=ReportedDate&optCols=IsReportedPrePoll&optCols=ReportingPeriodName'.
+					'&optCols=IsBequest&optCols=IsAggregation">'.
+					'local party donations declared to the Electoral Commission</a></li>';
             }
 
             print "</ul>\n";
@@ -525,7 +537,7 @@ if (true===function_exists('advertisement')) {
             # slip in a title in the multiperson case
 			if ($voter1attr['bmultiperson'] && ($divtabattr["votedisplay"] != "fullmotion"))
 				print "<tr><td colspan=7 align=left>
-                    <b>Votes by <a href=\"mp.php?".$mppropt['mpanchor']."\">" .$mppropt["name"]." MP</a></b>
+                    <b>Votes by <a href=\"/mp.php?".$mppropt['mpanchor']."\">" .$mppropt["name"]." MP</a></b>
                     </td></tr>\n";
 
 			# apply a designated voter

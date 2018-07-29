@@ -27,5 +27,3 @@ function link_to_mp($row, $i = 1)
 
     return "mpn$i=".urlencode(str_replace(" ", "_", $mpn))."&"."mpc$i=".urlencode(str_replace(" ", "_", $mpc))."&"."house$i=".urlencode($row['house']);
 }
-
-

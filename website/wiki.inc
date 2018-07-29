@@ -219,8 +219,8 @@ function get_motion_default_values($db, $params)
         return array($motion, $row['division_name']);
     }
 
-    trigger_error("Couldn't find motion text for division " . htmlspecialchars($parmas[0]) . " " . htmlspecialchars($params[1]) 
-        . " " . htmlspecialchars($params[2]), E_USER_ERROR);
+    trigger_error("Couldn't find motion text for division " . htmlspecialchars($params[0],ENT_QUOTES) . " " . htmlspecialchars($params[1],ENT_QUOTES)
+        . " " . htmlspecialchars($params[2],ENT_QUOTES).' from URL '.$_REQUEST['REQUEST_URI'], E_USER_ERROR);
 }
 
 # Makes sure the wiki_id value is up to date in pw_cache_divwiki for every

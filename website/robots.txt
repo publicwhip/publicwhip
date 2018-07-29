@@ -1,2 +1,11 @@
 User-Agent: *
 Disallow: /division-forum.php
+
+User-agent: AhrefsBot
+Disallow: /
+User-agent: SemrushBot
+Disallow: /
+User-agent: magpie-crawler
+Disallow: /
+User-agent: dotbot
+Disallow: /

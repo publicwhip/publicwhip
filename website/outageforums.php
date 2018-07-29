@@ -56,7 +56,7 @@ pw_header_notitle();
 <div class="homerecents">
 <div class="narrowwidth">
 <h2>Recent controversial divisions</h2>
-<p><a href="divisions.php" title="Show all divisions ordered by most recent">Show all divisions ordered by most recent</a></p>
+<p><a href="/divisions.php" title="Show all divisions ordered by most recent">Show all divisions ordered by most recent</a></p>
 
 <?php
 	$divtabattr = array(
@@ -72,15 +72,15 @@ pw_header_notitle();
 </div>
 
 <div class="col1"><h2>Top rebel MPs</h2>
-<p><a href="mps.php?sort=rebellions" title="Show all MPs ordered by rebellions">Show all MPs ordered by rebellions</a></p>
+<p><a href="/mps.php?sort=rebellions" title="Show all MPs ordered by rebellions">Show all MPs ordered by rebellions</a></p>
 </div>
 
 <div class="col2"><h2>MPs and Lords who attend parliament most often</h2>
-<p><a href="mps.php?sort=attendance&amp;house=both" title="Show all MPs ordered by attendance">Show all MPs ordered by attendance</a></p>
+<p><a href="/mps.php?sort=attendance&amp;house=both" title="Show all MPs ordered by attendance">Show all MPs ordered by attendance</a></p>
 </div>
 <div class="col3"><h2>Test an MP or Lord against policies you care about</h2>
-<p>Either <a href="policies.php">browse</a> existing policies or <a
-href="account/addpolicy.php">make</a> a new policy</p>
+<p>Either <a href="/policies.php">browse</a> existing policies or <a
+href="/account/addpolicy.php">make</a> a new policy</p>
 
 </div>
 <div class="clear"></div>

@@ -410,17 +410,17 @@ function print_column_headings($vote1, $vote2, $columnforms, $party)
 // this makes it easier to generating the heading and shuffle the columns
 function print_division_row($nrows, $pretrowclass, $rolecol, $roleclass, $vote1, $vote2, $row, $divhref, $divhrefcloseappend, $hrefsource, $columnforms)
 {
-    print "<tr class=\"".(($nrows % 2 == 1) ? "odd" : "even")."$pretrowclass\">";
+    print '<tr class="'.$pretrowclass.'">';
 
     if ($columnforms["hitcounter"])
         print "<td>".$row["hits"]."</td>";
 	if ($columnforms["house"]) {
         $house_name = "Commons";
-        if( $row['divisionhouse'] == "lords" )
+        if( $row['divisionhouse'] === "lords" )
             $house_name = "Lords";
-        if( $row['divisionhouse'] == "scotland" )
+        if( $row['divisionhouse'] === "scotland" )
             $house_name = "Scotland";
-	    print "<td class=\"".$row['divisionhouse']."\">".$house_name."</td>";
+	    print '<td class="'.$row['divisionhouse'].'">'.$house_name.'</td>';
     }
     if ($columnforms["divisionnumber"])
         print "<td>".$row['divisionnumber']."</td>";
@@ -569,18 +569,28 @@ function GetPartyVoteSummaryH($db, $div_id)
 
         $totalpartyvote[$party] += $count;
 
-        if ($vote == "aye")
-            $ayes[$party] += $count;
-        else if ($vote == "no")
-            $noes[$party] += $count;
-        else if ($vote == "both")
-            $boths[$party] += $count;
-        else if ($vote == "tellaye")
-            $tellayes[$party] += $count;
-        else if ($vote == "tellno")
-            $tellnoes[$party] += $count;
-        else
-            print "Unknown vote type: " + $vote;
+        switch ($vote) {
+            case 'aye':
+                $ayes[$party]+=$count;
+                break;
+            case 'no':
+                $noes[$party]+=$count;
+                break;
+            case 'both':
+                $boths[$party]+=$count;
+                break;
+            case 'tellaye':
+                $tellayes[$party]+=$count;
+                break;
+            case 'tellno':
+                $tellnoes[$party]+=$count;
+                break;
+            case 'abstention':
+                break;
+            default:
+                error_log('Unrecognised vote type: '.$vote.' in '.$_SERVER['REQUEST_URI']);
+                break;
+        }
         $whips[$party] = $whip;
     }
     $votes = array_sum(array_values($ayes)) +
@@ -603,7 +613,7 @@ function GetPartyVoteSummaryH($db, $div_id)
 
 function writepersonvote($lnrows, $cla, $name, $vote, $ayecla, $nocla)
 {
-    print "<tr class=\"".($lnrows != -1 ? (($lnrows % 2 == 1) ? "odd" : "even") : "")."$cla\">";
+    print '<tr class="'.$cla.'">';
     print "<td>$name</td>";
     if (($vote == "aye") || ($vote == "AYE"))
         print "<td$ayecla>Aye</td><td$nocla></td>";
@@ -649,7 +659,7 @@ function writenumbervote(&$lnrows, $gname, $sayes, $snoes, $ayecla, $nocla)
         $sayes = 0;
     if ($snoes == "")
         $snoes = 0;
-    print "<tr class=\"".(($lnrows % 2 == 1) ? "odd" : "even")."\">";
+    print "<tr>";
     print "<td>$gname</td><td$ayecla>$sayes</td><td$nocla>$snoes</td></tr>\n";
     $lnrows += 1;
 }
@@ -766,6 +776,7 @@ function writeevents(&$events, $date, $breversed)
 #
 function division_table($db, $divtabattr, $db2="", $events = "")
 {
+    print '<!-- division_table -->'.PHP_EOL;
     update_divisions_wiki_id($db);
 
     global $bdebug;
@@ -1068,11 +1079,21 @@ function division_table($db, $divtabattr, $db2="", $events = "")
 
         $debate_gid = str_replace("uk.org.publicwhip/debate/", "", $row['debate_gid']); # this entry in the database should tell us if it is a lords type.
         if ($debate_gid != "")
-            $hrefsource = "http://www.theyworkforyou.com/debates/?id=$debate_gid";
+            $hrefsource = "https://www.theyworkforyou.com/debates/?id=$debate_gid";
         else
             $hrefsource = $row['source_url'];
 
-        $divhref = "division.php?date=".urlencode($row['divisiondate'])."&number=".urlencode($row['divisionnumber']);
+        $divHouse='commons';
+        switch ($row['divisionhouse']) {
+            case 'lords':
+                $divHouse='lords';
+                break;
+            case 'scotland':
+                $divHouse='scotland';
+                break;
+        }
+       // $divhref='/division/'.$divHouse.'/'.urlencode($row['divisiondate']).'/'.urlencode($row['divisionnumber']);
+       $divhref = 'division.php?date='.urlencode($row['divisiondate']).'&house='.urlencode($divHouse).'&number='.urlencode($row['divisionnumber']);
         if ($divclose)
         {
 			if (($row['divisiondate'] == $divclose['division_date']) && ($row['divisionnumber'] == $divclose['division_number']))
@@ -1083,14 +1104,6 @@ function division_table($db, $divtabattr, $db2="", $events = "")
 			else
 	        	$divhrefcloseappend = "&date2=".urlencode($divclose['division_date'])."&number2=".urlencode($divclose['division_number']);
         }
-        if ($divhref)
-		{
-			$divhref .= $divtabattr["divhrefappend"];
-	        if ($row["divisionhouse"] == "lords")
-	            $divhref .= "&house=lords";
-            elseif ($row["divisionhouse"] == "scotland")
-	            $divhref .= "&house=scotland";
-		}
 
         # write out the events
         writeevents($events, $row['divisiondate'], $breversed);
@@ -1111,8 +1124,6 @@ function division_table($db, $divtabattr, $db2="", $events = "")
     }
     # finish the remainder of the events
     writeevents($events, "", $breversed);
-
+    print '<!-- /division_table -->'.PHP_EOL;
     return $dismetric;
 }
-
-?>

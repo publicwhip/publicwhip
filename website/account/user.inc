@@ -1,27 +1,39 @@
 <?php
 
-require_once $toppath . 'auth.inc';
-
 $feedback = '';
 
 if (!defined('HIDDEN_HASH_VAR')) {
     trigger_error("ERROR: include config.php first, and make sure it has values in", E_USER_ERROR);
 }
+require_once __DIR__."/../db.inc";
+require_once __DIR__."/../common.inc";
+
+/* auth_random_token
+ * Returns a random token. */
+function auth_random_token() {
+    $token=random_bytes(24);
+    $encoded=base64_encode($token);
+    return strtr($encoded,['+'=>'a','/'=>'b','='=>'c']);
+}
+
 
 if (!function_exists("user_isloggedin"))
 {
     unset($LOGGED_IN);
 
     function user_isloggedin() {
-            global $user_name,$id_hash,$LOGGED_IN;
+            global $user_name,$id_hash,$LOGGED_IN,$db;
 
-            if (!$user_name) {
-                $user_name=mysql_real_escape_string($_COOKIE["user_name"]);
+            if (!isset($_COOKIE['user_name'],$_COOKIE['id_hash'])) {
+                return false;
             }
-            
-            $id_hash=mysql_real_escape_string($_COOKIE["id_hash"]);
+            if (!$user_name) {
+                $user_name=$db->escape((string)$_COOKIE["user_name"]);
+            }
 
-            //have we already run the hash checks? 
+            $id_hash=$db->escape((string)$_COOKIE["id_hash"]);
+
+            //have we already run the hash checks?
             //If so, return the pre-set var
             if (isset($LOGGED_IN)) {
                 if ($LOGGED_IN) {
@@ -31,7 +43,7 @@ if (!function_exists("user_isloggedin"))
             if ($user_name && $id_hash) {
                     $hash=md5($user_name.HIDDEN_HASH_VAR);
                 #    print "hash $hash idhash $id_hash";
-                    if ($hash == $id_hash) {
+                    if ($hash === $id_hash) {
                             $LOGGED_IN=true;
                             return true;
                     } else {
@@ -196,7 +208,7 @@ function user_lost_password ($email,$user_name) {
                         $message = 
                                 "Your password has been changed to: $new_pass".
                                 "\nYour username is $user_name, email address $email.".
-                                "\n\nLogin here: http://www.publicwhip.org.uk/account/settings.php".
+                                "\n\nLogin here: https://www.publicwhip.org.uk/account/settings.php".
                                 "\n\nAfter login you can change your password to something memorable.";
 			mail ($email,'Public Whip Password Reset',$message,'From: auto@publicwhip.org.uk');
 			$feedback .= ' Your new password has been emailed to you. ';
@@ -243,7 +255,7 @@ function user_send_confirm_email($email,$hash, $user) {
 
 	$message = "Thank you for registering with the Public Whip!".
 		"\nSimply follow this link to confirm your registration: ".
-		"\n\nhttp://www.publicwhip.org.uk/account/confirm.php?hash=$hash&email=". urlencode($email).
+		"\n\nhttps://www.publicwhip.org.uk/account/confirm.php?hash=$hash&email=". urlencode($email).
 		"\n\nOnce you have confirmed, you will in future receive the".
                 "\nat most monthly Public Whip newsletter and be able".
                 "\nto access extra features on the website.".
@@ -321,6 +333,9 @@ function user_register($user_name,$password1,$password2,$email,$real_name) {
 }
 
 function user_getid() {
+    if (!user_isloggedin()) {
+        return false;
+    }
 	global $G_USER_RESULT;
 	//see if we have already fetched this user from the db, if not, fetch it
 	if (!$G_USER_RESULT) {
@@ -347,6 +362,9 @@ function user_getrealname() {
 }
 
 function user_getemail() {
+    if (!user_isloggedin()) {
+        return false;
+    }
 	global $G_USER_RESULT;
 	//see if we have already fetched this user from the db, if not, fetch it
 	if (!$G_USER_RESULT) {
@@ -360,6 +378,9 @@ function user_getemail() {
 }
 
 function user_getactivepolicy() {
+    if (!user_isloggedin()) {
+        return false;
+    }
 	global $G_USER_RESULT;
 	//see if we have already fetched this user from the db, if not, fetch it
 	if (!$G_USER_RESULT) {
@@ -373,6 +394,9 @@ function user_getactivepolicy() {
 }
 
 function user_getnewsletter() {
+    if (!user_isloggedin()) {
+        return false;
+    }
 	global $G_NEWSL_RESULT;
 	//see if we have already fetched this user from the db, if not, fetch it
 	if (!$G_NEWSL_RESULT) {
@@ -386,6 +410,9 @@ function user_getnewsletter() {
 }
 
 function user_changenewsletter($newsletter) {
+    if (!user_isloggedin()) {
+        return false;
+    }
     global $feedback;
     if ($newsletter)
         $newsletter = 1;
@@ -474,40 +501,47 @@ function pw_validate_email ($address) {
 
 function login_screen()
 {
-    global $feedback, $toppath, $onload, $title;
+    global $feedback, $title,$LOGGED_IN;
 
-    $onload = "givefocus('user_name')";
-    $title = "Login to Public Whip"; 
+    $title = "Login to Public Whip";
     pw_header();
 
-    if ($feedback) {
-        print "<div class=\"error\"><h2>Login not correct,
-        please try again</h2><p>$feedback</div>";
-    }
+    if ($LOGGED_IN) {
+        print '<p>Logged in</p>';
+    } else {
+        if ($feedback !== '') {
+            print'<div class="error"><h2>Login not correct, please try again</h2>';
+            print '<p>' . $feedback . '</div>';
+        }
 
-    global $this_place;
-    print '
+
+        global $this_place;
+        print '
         <P>
         Enter your user name and password and we\'ll set a cookie so we know you\'re logged in.
-        <p>Not got a login?  <A HREF="/account/register.php?r='.
-            ($_GET['r']?urlencode($_GET['r']):urlencode($this_place)).
-        '">Register a new
+        <p>Not got a login?  <A HREF="/account/register.php?r=' .
+            ($_GET['r'] ? urlencode($_GET['r']) : urlencode($this_place)) .
+            '">Register a new
         account</A>.  You will also receive a free email newsletter.
         <br>Lost your password? <a href="lostpass.php">Reset your password here</a>.
         <P>
-        <FORM ACTION="'. $PHP_SELF .'" METHOD="POST" name=pw>
+        <FORM ACTION="' . $PHP_SELF . '" METHOD="POST" name=pw>
         <B>User name:</B><BR>
         <INPUT TYPE="TEXT" NAME="user_name" id="user_name" VALUE="" SIZE="15" MAXLENGTH="15">
         <P>
         <B>Password:</B><BR>
         <INPUT TYPE="password" NAME="password" VALUE="" SIZE="15" MAXLENGTH="15">
         <P>';
-    if ($_GET['r']) {
-        print '<INPUT TYPE="hidden" NAME="r" VALUE="'.htmlspecialchars($_GET['r']).'">';
-    }
-    print '<INPUT TYPE="SUBMIT" NAME="submit" VALUE="Login to Public Whip">
+        if ($_GET['r']) {
+            print '<INPUT TYPE="hidden" NAME="r" VALUE="' . htmlspecialchars($_GET['r'], ENT_QUOTES) . '">';
+        }
+        print '<INPUT TYPE="SUBMIT" NAME="submit" VALUE="Login to Public Whip">
         </FORM>
         <P>';
+
+        print '<p>You are accessing the site from ' . htmlspecialchars($_SERVER['REMOTE_ADDR'] ?? '',
+                ENT_QUOTES) . '.</p>';
+    }
     pw_footer();
 }
 
@@ -539,4 +573,3 @@ function audit_log($text)
         print "Error writing to audit log: " . db_error();
 }
 	
-?>

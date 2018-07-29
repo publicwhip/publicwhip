@@ -2,6 +2,7 @@
 
 use warnings;
 use strict;
+use lib ".";
 use PublicWhip::DB;
 use PublicWhip::Parliaments;
 use PublicWhip::SQLfragments;

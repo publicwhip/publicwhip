@@ -42,14 +42,14 @@
     pw_header();
 ?>
 <p>Written Answers are now available from <a href="http://www.theyworkforyou.com/wrans">TheyWorkForYou.com</a> instead of The Public Whip.
-<?
+<?php
     if ($shellid != "") {
         print "The Written Answer $shellid is probably misspelt, and could not
         be found on TheyWorkForYou.com.  You will have to go there and search
         in order to find it.";
     }
 ?>
-<?
+<?php
 
 ?>
 

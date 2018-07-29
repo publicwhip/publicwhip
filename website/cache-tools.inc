@@ -6,7 +6,7 @@
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
 
-require_once $toppath . "account/user.inc";
+require_once __DIR__.'/account/user.inc';
 
 function cache_begin($cache_params) {
     global $cache_dir, $cache_dir, $cache_file, $pw_cache_top, $pw_cache_enable;
@@ -16,8 +16,8 @@ function cache_begin($cache_params) {
         $cache_params = md5($_SERVER['QUERY_STRING']);
     $cache_file = $cache_dir . $cache_params . ".html";
 
-    require_once $toppath . "account/user.inc";
-    require_once $toppath . "cache-tools.inc";
+    require_once __DIR__.'/account/user.inc';
+    require_once __DIR__.'/cache-tools.inc';
 
     if (file_exists($cache_file) && $pw_cache_enable)
     {

@@ -1,4 +1,5 @@
-<?php require_once "../common.inc";
+<?php
+        require_once __DIR__.'/../common.inc';
 # $Id: mp-info.xml,v 1.10 2011/03/22 14:25:48 publicwhip Exp $
 
 # Print information in XML about each MP.  e.g. Rebellion rate.
@@ -8,8 +9,9 @@
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
 
-require_once "../db.inc";
-require_once "../parliaments.inc";
+        require_once __DIR__.'/../db.inc';
+        require_once __DIR__.'/../parliaments.inc';
+
 $db = new DB(); 
 $db2 = new DB(); 
 

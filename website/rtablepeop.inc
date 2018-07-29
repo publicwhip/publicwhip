@@ -6,8 +6,9 @@
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
 
-require_once $toppath . "links.inc";
-require_once $toppath . "parliaments.inc";
+require_once __DIR__.'/parliaments.inc';
+require_once __DIR__.'/links.inc';
+
 
 
 function print_mpcolumn_headings($columnforms)
@@ -65,7 +66,7 @@ function print_mp_row($nrows, $row, $name, $href, $colstyle, $showwhich, $friend
             $sclassd = ((($colstyle == "division2invert") == ($dtvote_a == $dtvote_b)) ? "rebel" : "teller");
     }
 
-    print "<tr class=\"".(($nrows % 2 == 1) ? "odd" : "even").$sclass."\">";
+    print '<tr class="'.$sclass.'">';
 
 
     # row numbering
@@ -96,7 +97,7 @@ function print_mp_row($nrows, $row, $name, $href, $colstyle, $showwhich, $friend
 	{
     	print "<td>";
 		if ($row['house'] != 'lords')
-		print "<a href=\"mp.php?mpc=".urlencode($row['constituency'])."&house=".urlencode($row['house'])."\">".$row['constituency']."</a>";
+		print "<a href=\"/mp.php?mpc=".urlencode($row['constituency'])."&house=".urlencode($row['house'])."\">".$row['constituency']."</a>";
     	else
         	print "<i>(Lords)</i>";
 		print "</td>";
@@ -559,7 +560,7 @@ function mp_table($db, $mptabattr)
                 continue;
             }
             $mpname = $row['first_name']." ".$row['last_name'];
-            $href = "mp.php?" . link_to_mp($row);
+            $href = "/mp.php?" . link_to_mp($row);
             if (strlen($mpname) > 22)
                 $mpname = $row['first_name'][0]." ".$row['last_name'];
             if (strlen($mpname) > 18)

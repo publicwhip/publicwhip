@@ -17,7 +17,7 @@ use Carp;
 use constant ERR_IMPORTANT => 10;
 use constant ERR_USEFUL    => 5;
 use constant ERR_CHITTER   => 1;
-our @EXPORT = qw(ERR_IMPORTANT ERR_USEFUL ERR_CHITTER);
+our @EXPORT_OK = ('ERR_IMPORTANT', 'ERR_USEFUL', 'ERR_CHITTER');
 
 our $verbosity = ERR_IMPORTANT;
 

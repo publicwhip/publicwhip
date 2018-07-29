@@ -1,4 +1,4 @@
-<?php require_once "../common.inc";
+<?php require_once __DIR__."/../common.inc";
 
 # $Id: register.php,v 1.25 2006/03/06 19:09:56 frabcus Exp $
 
@@ -7,7 +7,7 @@
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
 
-require_once "../database.inc";
+require_once __DIR__."/../database.inc";
 require_once "user.inc";
 
 $user_name=mysql_real_escape_string($_POST["user_name"]);
@@ -28,7 +28,6 @@ if ($submit) {
 }
 
 $title = "Sign up for Newsletter, Forum and Policies"; 
-$onload = "givefocus('real_name')";
 pw_header();
 
 if ($feedback) {
@@ -98,4 +97,4 @@ if (!$ok)
 }
 ?>
 
-<?php pw_footer() ?>
+<?php pw_footer();

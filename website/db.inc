@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__.'/../mysqlshim.php';
 # $Id: db.inc,v 1.33 2011/06/12 20:44:44 publicwhip Exp $
 # Database access wrapper.  Calls mysql.
 
@@ -284,6 +284,10 @@ class DB
     function disconnect()
     {
         mysql_close($this->link);
+    }
+
+    function escape($string) {
+        return mysqli_real_escape_string($this->link,$string);
     }
 
 }

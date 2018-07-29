@@ -43,9 +43,9 @@ pw_header_notitle();
 
 <div class="homesearch">
 <h2>Search the Whip</h2>
-<p>Enter your <strong>postcode</strong>, an <strong>MP</strong> or <strong>Lord’s name</strong>, or a particular <strong>topic</strong> of interest</p>
+<p>Enter your <strong>postcode</strong>, an <strong>MP</strong> or <strong>Lord/Lady's name</strong>, or a particular <strong>topic</strong> of interest</p>
 <form class="searchtitlebarform" action="/search.php" name="pw" method="get">
-<input maxLength=256 size=12 name="query" id="query" onblur="fadeout(this)" onfocus="fadein(this)"> <button type="submit" value="Submit" name="button">Submit</button>
+<input maxLength=256 size=12 name="query" id="query" placeholder="Postcode or Word"> <button type="submit" value="Submit" name="button">Submit</button>
 </form>
 </div>
     <?php
@@ -72,11 +72,11 @@ advertisement('homepage');
 </div>
 
 <div class="col1"><h2>Top rebel MPs</h2>
-<p><a href="mps.php?sort=rebellions" title="Show all MPs ordered by rebellions">Show all MPs ordered by rebellions</a></p>
+<p><a href="/mps.php?sort=rebellions" title="Show all MPs ordered by rebellions">Show all MPs ordered by rebellions</a></p>
 </div>
 
 <div class="col2"><h2>MPs and Lords who attend parliament most often</h2>
-<p><a href="mps.php?sort=attendance&amp;house=both" title="Show all MPs ordered by attendance">Show all MPs ordered by attendance</a></p>
+<p><a href="/mps.php?sort=attendance&amp;house=both" title="Show all MPs ordered by attendance">Show all MPs ordered by attendance</a></p>
 </div>
 <div class="col3"><h2>Test an MP or Lord against policies you care about</h2>
 <p><a href="policies.php">Browse</a> existing policies </p>

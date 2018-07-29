@@ -63,10 +63,10 @@ function write_single_policy_vote($db, $divattr, $voter)
             global $domain_name;
             $forum_division_link = $divattr["house"] . " division " .
                 $divattr['division_date'] . " #".$divattr['division_number'] . ", " .
-                " [url=http://$domain_name/division.php?date=".
+                " [url=https://$domain_name/division.php?date=".
                 $divattr["division_date"]."&number=".$divattr['division_number']."&house=".$divattr["house"].
                 "&dmp=".$voter."]".$divattr["name"]."[/url]";
-            $forum_policy_link = "[url=http://$domain_name/policy.php?id=$voter]".$policyname."[/url]";
+            $forum_policy_link = "[url=/policy.php?id=$voter]".$policyname."[/url]";
 
             # set the query that deletes, inserts, or changes the vote
             if ($newbvote == "--")
@@ -122,7 +122,7 @@ function write_single_policy_vote($db, $divattr, $voter)
     if ($votechangeable)
         print ' <strong>Please read policy definition and division description before altering vote</strong> <br>';
     print "And policy ";
-    print "<a href=\"policy.php?id=$voter\">$policyname</a>";
+    print "<a href=\"/policy.php?id=$voter\">$policyname</a>";
     if ($votechangeable)
         print ' (<a href="/policies.php">change</a>)';
     if ($legacydreammp)

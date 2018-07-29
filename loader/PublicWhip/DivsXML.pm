@@ -9,6 +9,9 @@
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
 
+use lib ".";
+
+
 package PublicWhip::DivsXML;
 use strict;
 
@@ -18,10 +21,11 @@ use XML::Twig;
 use Text::Autoformat;
 use PublicWhip::DB;
 use PublicWhip::Error;
+
 use Data::Dumper;
 use Unicode::String qw(utf8 latin1 utf16);
 
-our $toppath    = $ENV{'HOME'} . "/pwdata/";
+our $toppath = $ENV{'HOME'} . "/pwdata/";
 
 our $cursuffix;
 our $curdate;
@@ -45,12 +49,12 @@ our $spsubject;
 sub read_xml_files {
     $dbh = shift;
     my $from = shift;
-    my $to   = shift;
+    my $to = shift;
     my $debatepath = shift;
-    my $fileprefix  = shift;
-    $house  = shift; # global
+    my $fileprefix = shift;
+    $house = shift; # global
     my $motionspath;
-    if( $house eq "scotland" ) {
+    if ($house eq "scotland") {
         $motionspath = shift;
     }
     die if $house ne "lords" && $house ne "commons" and $house ne "scotland";
@@ -60,11 +64,11 @@ sub read_xml_files {
         #print "Loading SP motions...\n";
         # If this for the Scottish Parliament, parse all the motions
         # with SPIDs:
-        my $twig_sp_motions = XML::Twig->new( twig_handlers => {
-            'spmotion'  => \&loadspmotion },
-                              output_filter => 'safe' );
+        my $twig_sp_motions = XML::Twig->new(twig_handlers => {
+            'spmotion' => \&loadspmotion },
+            output_filter                                  => 'safe');
         my @motionsfiles = glob($motionspath . "*.xml");
-        foreach( @motionsfiles ) {
+        foreach (@motionsfiles) {
             $twig_sp_motions->parsefile($_);
         }
         #print "done.\n";
@@ -88,38 +92,41 @@ sub read_xml_files {
     opendir DIR, $debatepath or die "Cannot open $debatepath: $!\n";
     my @files;
     while (my $file = readdir(DIR)) {
-	push(@files,$file);
+        push(@files, $file);
     }
-    @files=sort { $a cmp $b} @files;
+    @files = sort {$a cmp $b} @files;
     foreach my $file (@files) {
-        if ( $file =~ m/^$fileprefix(\d\d\d\d-\d\d-\d\d)([a-z]*).xml$/ ) {
+        if ($file =~ m/^$fileprefix(\d\d\d\d-\d\d-\d\d)([a-z]*).xml$/) {
             $curdate = $1;
             $cursuffix = $2;
-            if ( ( $curdate ge $from ) and ( $curdate le $to ) ) {
-                PublicWhip::Error::log( "Processing XML divisions", $curdate, ERR_USEFUL );
-                $lastmajor      = "";
-                $lastminor      = "";
+            if (($curdate ge $from) and ($curdate le $to)) {
+                PublicWhip::Error::log("Processing XML divisions", $curdate, PublicWhip::Error::ERR_USEFUL);
+                $lastmajor = "";
+                $lastminor = "";
                 $lastmotiontext = "";
                 @speechesbefore = ();
                 $lastheadingurl = "";
                 $lastheadinggid = "";
                 my $file_to_parse = $debatepath . "$fileprefix" . $curdate . $cursuffix . ".xml";
-                PublicWhip::Error::log( "File: $file_to_parse", $curdate, ERR_USEFUL );
+                PublicWhip::Error::log("File: $file_to_parse", $curdate, PublicWhip::Error::ERR_USEFUL);
 
                 $twig_header->parsefile($file_to_parse);
                 my $root = $twig_header->root();
                 my $in_latest_file = 0;
                 if ($root->att('latest') && $root->att('latest') eq "yes") {
-                    PublicWhip::Error::log( "File is latest for date", $curdate, ERR_USEFUL );
+                    PublicWhip::Error::log("File is latest for date", $curdate, PublicWhip::Error::ERR_USEFUL);
                     $in_latest_file = 1;
-                } elsif ($root->att('latest') && $root->att('latest') eq "no") {
-                    PublicWhip::Error::log( "File is old one for date", $curdate, ERR_USEFUL );
+                }
+                elsif ($root->att('latest') && $root->att('latest') eq "no") {
+                    PublicWhip::Error::log("File is old one for date", $curdate, PublicWhip::Error::ERR_USEFUL);
                     $in_latest_file = 0;
-                } elsif (!$root->att('latest')) {
+                }
+                elsif (!$root->att('latest')) {
                     # legacy files
-                    PublicWhip::Error::log( "File is legacy file, so is latest for date", $curdate, ERR_USEFUL );
+                    PublicWhip::Error::log("File is legacy file, so is latest for date", $curdate, PublicWhip::Error::ERR_USEFUL);
                     $in_latest_file = 1;
-                } else {
+                }
+                else {
                     die "unknown attributes in publicwhip tag";
                 }
                 if ($in_latest_file) {
@@ -136,26 +143,26 @@ sub array_difference {
     my $array1 = shift;
     my $array2 = shift;
 
-    my @union        = ();
+    my @union = ();
     my @intersection = ();
-    my @difference   = ();
+    my @difference = ();
 
     my %count = ();
-    foreach my $element ( @$array1, @$array2 ) { $count{$element}++ }
-    foreach my $element ( keys %count ) {
+    foreach my $element (@$array1, @$array2) {$count{$element}++}
+    foreach my $element (keys %count) {
         push @union, $element;
-        push @{ $count{$element} > 1 ? \@intersection : \@difference },
-          $element;
+        push @{$count{$element} > 1 ? \@intersection : \@difference},
+            $element;
     }
     return \@difference;
 }
 
 sub storeminor {
-    my ( $twig, $minor ) = @_;
+    my ($twig, $minor) = @_;
 
     my $t = $minor->sprint(1);
 
-    $lastminor      = $t;
+    $lastminor = $t;
     $lastmotiontext = "";
     @speechesbefore = ();
     $lastheadingurl = $minor->att('url');
@@ -165,7 +172,7 @@ sub storeminor {
 }
 
 sub storemajor {
-    my ( $twig, $major ) = @_;
+    my ($twig, $major) = @_;
 
     my $t = $major->sprint(1);
 
@@ -173,19 +180,19 @@ sub storemajor {
     # announced in the middle of other debates and confuse
     # things (the actual votes appear at the end of the days
     # proceedings, with a separate lowercase "deferred division" heading)
-    if ( $t =~ m/^\s*DEFERRED DIVISION\s*$/ ) {
+    if ($t =~ m/^\s*DEFERRED DIVISION\s*$/) {
         return;
     }
 
     # 2003-02-26 Iraq debate has a capital title
     # "BUSINESS OF THE HOUSE" which is unimportant
     # and otherwise overwrites the correct title
-    if ( $t =~ m/^\s*BUSINESS OF THE HOUSE\s*$/ ) {
+    if ($t =~ m/^\s*BUSINESS OF THE HOUSE\s*$/) {
         return;
     }
 
-    $lastmajor      = $t;
-    $lastminor      = "";
+    $lastmajor = $t;
+    $lastminor = "";
     $lastmotiontext = "";
     @speechesbefore = ();
     $lastheadingurl = $major->att('url');
@@ -195,39 +202,40 @@ sub storemajor {
 }
 
 sub storemotion {
-    my ( $twig, $p ) = @_;
+    my ($twig, $p) = @_;
 
-    if ( $p->att('pwmotiontext') ) {
-        if ( $p->att('pwmotiontext') eq "withdrawn" || $p->att('pwmotiontext') eq "agreedto") {
+    if ($p->att('pwmotiontext')) {
+        if ($p->att('pwmotiontext') eq "withdrawn" || $p->att('pwmotiontext') eq "agreedto") {
             $lastmotiontext = "";
-        } else {
+        }
+        else {
             $lastmotiontext .= $p->sprint(0);
             $lastmotiontext .= "\n\n";
         }
     }
 
-    if ( $house eq "scotland" ) {
-	# If this is a paragraph from a Scottish Parliament debate
-	# then we want to look for IDs of the form S[0-9]M-[0-9\.]+ so
-	# that we can use that key to extract further information
-	# about the motion from the XML.
-	#
-	# The longest of these is likely to be the ID acutally
-	# referred to, since descriptions of amendments include both,
-	# and the amendment IDs are formed by adding .1, .2, etc. to
-	# the ID.
-	my $ptext = $p->sprint(0);
-	my @matches = $ptext =~ /S[0-9]M-[0-9\.]+/g;
-	my $longestinthis = "";
-	foreach my $match (@matches) {
-	    if (length($match) >= length($longestinthis)) {
-		$longestinthis = $match;
-	    }
-	}
-	if ($longestinthis) {
-	    $lastlongestspid = $longestinthis;
-	}
-	push @speechesbefore, $ptext;
+    if ($house eq "scotland") {
+        # If this is a paragraph from a Scottish Parliament debate
+        # then we want to look for IDs of the form S[0-9]M-[0-9\.]+ so
+        # that we can use that key to extract further information
+        # about the motion from the XML.
+        #
+        # The longest of these is likely to be the ID acutally
+        # referred to, since descriptions of amendments include both,
+        # and the amendment IDs are formed by adding .1, .2, etc. to
+        # the ID.
+        my $ptext = $p->sprint(0);
+        my @matches = $ptext =~ /S[0-9]M-[0-9\.]+/g;
+        my $longestinthis = "";
+        foreach my $match (@matches) {
+            if (length($match) >= length($longestinthis)) {
+                $longestinthis = $match;
+            }
+        }
+        if ($longestinthis) {
+            $lastlongestspid = $longestinthis;
+        }
+        push @speechesbefore, $ptext;
     }
 }
 
@@ -239,8 +247,8 @@ sub fix_case {
 
     # We work on each hyphen (mdash, &#8212;) separated section separately
     my @parts = split /&#8212;/;
-    my @fixed_parts = map( &fix_case_part, @parts );
-    $_ = join( " &#8212; ", @fixed_parts );
+    my @fixed_parts = map ( &fix_case_part, @parts );
+    $_ = join(" &#8212; ", @fixed_parts);
 
     s/Orders of the Day &#8212; //;
 
@@ -255,8 +263,8 @@ sub fix_case_part {
 
     # if it is all capitals in Hansard
     # e.g. CABINET OFFICE
-    if ( !m/[a-z]/ ) {
-        s/\s+$//;    # these confuse autoformat into thinking it is a heading...
+    if (!m/[a-z]/) {
+        s/\s+$//; # these confuse autoformat into thinking it is a heading...
         s/^\s+//;
         $_ = autoformat $_, { case => 'highlight' };
     }
@@ -270,7 +278,7 @@ sub fix_case_part {
 }
 
 sub loaddivision {
-    my ( $twig, $div ) = @_;
+    my ($twig, $div) = @_;
 
     # Makes heading
 
@@ -278,7 +286,7 @@ sub loaddivision {
     die "inconsistent date" if $divdate ne $curdate;
     #print "---- $divdate --- $house --------------------------\n";
     my $divnumber = $div->att('divnumber');
-    my $heading   = "";
+    my $heading = "";
     if ($lastmajor) {
         $heading .= fix_case($lastmajor);
     }
@@ -289,31 +297,31 @@ sub loaddivision {
         $heading .= fix_case($lastminor);
     }
     if ($lastlongestspid) {
-	my $amendment = "";
-	if ($lastlongestspid =~ /\./) {
-	    $amendment = " (Amendment)";
-	}
-	$heading = "[$lastlongestspid$amendment] $heading";
+        my $amendment = "";
+        if ($lastlongestspid =~ /\./) {
+            $amendment = " (Amendment)";
+        }
+        $heading = "[$lastlongestspid$amendment] $heading";
     }
     if ($spsubject) {
-	$heading .= " &#8212; $spsubject";
+        $heading .= " &#8212; $spsubject";
     }
 
-# Should emdashes in headings have spaces round them?  This removes them if they shouldn't.
-# $heading =~ s/ \&\#8212; /\&\#8212;/g;
+    # Should emdashes in headings have spaces round them?  This removes them if they shouldn't.
+    # $heading =~ s/ \&\#8212; /\&\#8212;/g;
 
-    my $url         = $div->att('url') || "";
-    my $gid         = $div->att('id');
-    my $debate_url  = $lastheadingurl || "";
-    my $debate_gid  = $lastheadinggid;
+    my $url = $div->att('url') || "";
+    my $gid = $div->att('id');
+    my $debate_url = $lastheadingurl || "";
+    my $debate_gid = $lastheadinggid;
     my $motion_text = $lastmotiontext;
     my $clock_time = $div->att('time');
     $lastmotiontext = "";
     if ($house eq 'scotland') {
-        my @last_three = @speechesbefore[-3..-1];
-        @last_three = grep { defined $_ } @last_three;
+        my @last_three = @speechesbefore[-3 .. -1];
+        @last_three = grep {defined $_} @last_three;
         #print "@last_three ", Dumper(\@last_three);
-        $motion_text = join("\n\n",@last_three);
+        $motion_text = join("\n\n", @last_three);
         if ($lastlongestspid) {
             my $prefix_with = "<p>This looks like the vote on $lastlongestspid</p>";
             if (exists $spmotions{$lastlongestspid}) {
@@ -328,11 +336,12 @@ sub loaddivision {
             $prefix_with .= "<p>You can <a href=\"http://www.theyworkforyou.com/search/?s=&phrase=";
             $prefix_with .= $lastlongestspid;
             $prefix_with .= "&exclude=&from=$divdate&to=$divdate\">search for this motion (";
-            $prefix_with .= $lastlongestspid.") on TheyWorkForYou</a></p>";
+            $prefix_with .= $lastlongestspid . ") on TheyWorkForYou</a></p>";
             $prefix_with .= "<p><b>Text Introducing Division:</b></p>";
             if ($motion_text eq "") {
                 $motion_text = $prefix_with . "<p>No text found</p>";
-            } else {
+            }
+            else {
                 $motion_text = $prefix_with . "<p>$motion_text</p>";
             }
         }
@@ -346,7 +355,7 @@ sub loaddivision {
         $clock_time = "0" . $clock_time; # 3 digit hours due to >24 hour days that parliament sometimes has
     }
     if ($clock_time !~ m/^\d\d\d:\d\d:\d\d$/) {
-        PublicWhip::Error::warn("clock time '$clock_time' not in right format");
+        PublicWhip::Error::warn("clock time '$clock_time' not in right format for ".$debate_url." ".$debate_gid);
         $clock_time = '';
     }
 
@@ -361,44 +370,63 @@ sub loaddivision {
     # Find votes of MPs
     my $votes;
     for (
-        my $mplist = $div->first_child($listeltname) ;
-        $mplist ;
+        my $mplist = $div->first_child($listeltname);
+        $mplist;
         $mplist = $mplist->next_sibling($listeltname)
-      )
-    {
+    ) {
         for (
-            my $mpname = $mplist->first_child($votereltname) ;
-            $mpname ;
+            my $mpname = $mplist->first_child($votereltname);
+            $mpname;
             $mpname = $mpname->next_sibling($votereltname)
-          )
-        {
+        ) {
             my $vote = $mpname->att('vote');
             my $tell = $mpname->att('teller');
-            if ( not defined($tell) ) { $tell = ""; }
-            elsif ( $tell eq "yes" ) { $tell = "tell"; }
-            else { die "unexpected tell value $tell"; }
+            if (not defined($tell)) {$tell = "";}
+            elsif ($tell eq "yes") {$tell = "tell";}
+            else {die "unexpected tell value $tell";}
             my $id = $mpname->att('id');
+            my $valid = 1;
             if (!$id) {
                 $id = person_to_member($mpname->att('person_id'), $house, $divdate);
             }
-            die "Not an integer MP identifier: " . $mpname->sprint unless $id;
-            # print STDERR "$vote $tell $id\n";
-            if ($house eq 'commons' or $house eq 'scotland') {
-                $id =~ s:uk.org.publicwhip/member/::;
-            } else {
-                $id =~ s:uk.org.publicwhip/lord/::;
+            if (!$id) {
+                $valid = 0;
+                PublicWhip::Error::log(
+                    "Not an integer MP identifier " . $mpname->sprint,
+                    $debate_url,
+                    PublicWhip::Error::ERR_USEFUL
+                );
             }
-            die "Not an integer MP identifier: '$id' " . $mpname->sprint if ($id !~ m/^[1-9][0-9]*$/);
-            if ($house eq 'lords') {
-                $vote = 'aye' if $vote eq 'content';
-                $vote = 'no' if $vote eq 'not-content';
-            } elsif ($house eq 'scotland') {
-		$vote = 'aye' if $vote eq 'for';
-		$vote = 'no' if $vote eq 'against';
-		$vote = 'abstention' if $vote eq 'abstentions';
-		$vote = 'spoiled' if $vote eq 'spoiled votes';
-	    }
-            push @{ $votes->{$id} }, "$tell$vote";
+            if ($valid==1) {
+                # print STDERR "$vote $tell $id\n";
+                if ($house eq 'commons' or $house eq 'scotland') {
+                    $id =~ s:uk.org.publicwhip/member/::;
+                }
+                else {
+                    $id =~ s:uk.org.publicwhip/lord/::;
+                }
+                if (($id !~ m/^[1-9][0-9]*$/)) {
+                    $valid = 0;
+                    PublicWhip::Error::log(
+                        "Not an integer MP identifier " . $id . " from " . $mpname->sprint,
+                        $debate_url,
+                        PublicWhip::Error::ERR_USEFUL
+                    );
+                }
+            }
+            if ($valid==1) {
+                if ($house eq 'lords') {
+                    $vote = 'aye' if $vote eq 'content';
+                    $vote = 'no' if $vote eq 'not-content';
+                }
+                elsif ($house eq 'scotland') {
+                    $vote = 'aye' if $vote eq 'for';
+                    $vote = 'no' if $vote eq 'against';
+                    $vote = 'abstention' if $vote eq 'abstentions';
+                    $vote = 'spoiled' if $vote eq 'spoiled votes';
+                }
+                push @{$votes->{$id}}, "$tell$vote";
+            }
         }
     }
 
@@ -407,22 +435,22 @@ sub loaddivision {
     # See if we already have the division
     my $sth = PublicWhip::DB::query(
         $dbh,
-"select division_id, valid, division_name, motion, source_url,
+        "select division_id, valid, division_name, motion, source_url,
 debate_url, source_gid, debate_gid, clock_time from pw_division where
         division_number = ? and division_date = ? and house = ?", $divnumber, $divdate, $house
     );
-    die "Division $divnumber on $divdate house $house already in database more than once" if ( $sth->rows > 1 );
+    die "Division $divnumber on $divdate house $house already in database more than once" if ($sth->rows > 1);
 
-    if ( $sth->rows > 0 ) {
+    if ($sth->rows > 0) {
 
-	# print "Already have that one...\n";
+        # print "Already have that one...\n";
 
         # We already have - update it
         my @data = $sth->fetchrow_array();
-        die "Incomplete division $divnumber, $divdate already exists, clean the database" if ( $data[1] != 1 );
-        my $existing_divid      = $data[0];
-        my $existing_heading    = $data[2];
-        my $existing_motion     = $data[3];
+        die "Incomplete division $divnumber, $divdate already exists, clean the database" if ($data[1] != 1);
+        my $existing_divid = $data[0];
+        my $existing_heading = $data[2];
+        my $existing_motion = $data[3];
         my $existing_source_url = $data[4];
         my $existing_debate_url = $data[5] || "";
         my $existing_source_gid = $data[6];
@@ -454,17 +482,16 @@ debate_url, source_gid, debate_gid, clock_time from pw_division where
         #    print "####! Difference clock time between\n == $existing_clock_time\n == $clock_time\n";
         #}
 
-        if (   ( $existing_heading ne $heading )
-            or ( $existing_motion     ne $motion_text )
-            or ( $existing_source_url ne $url )
-            or ( $existing_debate_url ne $debate_url )
-            or ( $existing_source_gid ne $gid )
-            or ( $existing_debate_gid ne $debate_gid ) 
-            or ( $existing_clock_time ne $clock_time) )
-        {
+        if (($existing_heading ne $heading)
+            or ($existing_motion ne $motion_text)
+            or ($existing_source_url ne $url)
+            or ($existing_debate_url ne $debate_url)
+            or ($existing_source_gid ne $gid)
+            or ($existing_debate_gid ne $debate_gid)
+            or ($existing_clock_time ne $clock_time)) {
             my $sth = PublicWhip::DB::query(
                 $dbh,
-"update pw_division set division_name = ?, motion = ?, source_url = ?,
+                "update pw_division set division_name = ?, motion = ?, source_url = ?,
 debate_url = ?, source_gid = ?, debate_gid = ?, clock_time = ? where division_id = ? and house = ?",
                 $heading,
                 $motion_text,
@@ -479,68 +506,68 @@ debate_url = ?, source_gid = ?, debate_gid = ?, clock_time = ? where division_id
 
             die "Failed to fix division name/motion/URLs/clock" if $sth->rows != 1;
             PublicWhip::Error::log(
-"Existing division $house, $divnumber, $divdate, id $existing_divid name $existing_heading has had its name/motion/URLs/gids corrected with the one from XML called $heading",
-                $divdate, ERR_IMPORTANT);
+                "Existing division $house, $divnumber, $divdate, id $existing_divid name $existing_heading has had its name/motion/URLs/gids corrected with the one from XML called $heading",
+                $divdate, PublicWhip::Error::ERR_IMPORTANT);
             $PublicWhip::DivsXML::divisions_changed = 1;
         }
         else {
             PublicWhip::Error::log(
-"Division already in DB for $house division $divnumber on date $divdate",
-                $divdate, ERR_USEFUL
+                "Division already in DB for $house division $divnumber on date $divdate",
+                $divdate, PublicWhip::Error::ERR_USEFUL
             );
         }
 
-        my $sth = PublicWhip::DB::query( $dbh,
-"select mp_id, vote from pw_vote where division_id = $existing_divid"
+        my $sth = PublicWhip::DB::query($dbh,
+            "select mp_id, vote from pw_vote where division_id = $existing_divid"
         );
         my $existing_votes;
-        while ( @data = $sth->fetchrow_array() ) {
+        while (@data = $sth->fetchrow_array()) {
             my $exist_mpid = $data[0];
             my $exist_vote = $data[1];
-            if ( $exist_vote eq "both" ) {
-                push @{ $existing_votes->{$exist_mpid} }, "aye";
-                push @{ $existing_votes->{$exist_mpid} }, "no";
+            if ($exist_vote eq "both") {
+                push @{$existing_votes->{$exist_mpid}}, "aye";
+                push @{$existing_votes->{$exist_mpid}}, "no";
             }
             else {
-                push @{ $existing_votes->{$exist_mpid} }, $exist_vote;
+                push @{$existing_votes->{$exist_mpid}}, $exist_vote;
             }
         }
 
         my $differ = 0;
 
-        my @voters          = keys %$votes;
+        my @voters = keys %$votes;
         my @existing_voters = keys %$existing_votes;
-        @voters          = sort @voters;
+        @voters = sort @voters;
         @existing_voters = sort @existing_voters;
-        my $missing = array_difference( \@voters, \@existing_voters );
+        my $missing = array_difference(\@voters, \@existing_voters);
         my $amount = @$missing;
-        if ( $amount > 0 ) {
+        if ($amount > 0) {
             PublicWhip::Error::log(
-"Voter list differs in XML to one in database - $amount in symmetric diff\n$url"
-                  . Dumper($missing),
-                , $divdate . " " . $divnumber, ERR_USEFUL
+                "Voter list differs in XML to one in database - $amount in symmetric diff\n$url"
+                    . Dumper($missing),
+                , $divdate . " " . $divnumber, PublicWhip::Error::ERR_USEFUL
             );
             $differ = 1;
         }
 
-        if ( !$differ ) {
-	    # print "They don't differ...\n";
+        if (!$differ) {
+            # print "They don't differ...\n";
             foreach my $testid (@voters) {
-                my $indvotes          = $votes->{$testid};
+                my $indvotes = $votes->{$testid};
                 my $existing_indvotes = $existing_votes->{$testid};
-                @$indvotes          = sort @$indvotes;
+                @$indvotes = sort @$indvotes;
                 @$existing_indvotes = sort @$existing_indvotes;
 
                 # print $testid, $indvotes, $existing_indvotes, "\n";
-                my $missing = array_difference( $indvotes, $existing_indvotes );
+                my $missing = array_difference($indvotes, $existing_indvotes);
                 my $amount = @$missing;
-                if ( $amount > 0 ) {
+                if ($amount > 0) {
                     PublicWhip::Error::log(
-"Votes for MP $testid differs between database and XML\n"
-                          . "xml "
-                          . Dumper($indvotes) . "\n" . "db "
-                          . Dumper($existing_indvotes) . "\n",
-                        $curdate, ERR_USEFUL
+                        "Votes for MP $testid differs between database and XML\n"
+                            . "xml "
+                            . Dumper($indvotes) . "\n" . "db "
+                            . Dumper($existing_indvotes) . "\n",
+                        $curdate, PublicWhip::Error::ERR_USEFUL
                     );
                     $differ = 1;
                 }
@@ -548,20 +575,20 @@ debate_url = ?, source_gid = ?, debate_gid = ?, clock_time = ? where division_id
         }
 
         if ($differ) {
-	    # print "There was a difference...\n";
+            # print "There was a difference...\n";
             # Remove existing division we're correcting
             my $sth = PublicWhip::DB::query(
                 $dbh, "delete from pw_division where
                 division_number = ? and division_date = ? and house = ?", $divnumber, $divdate, $house
             );
             die "Deleted not one old version of division but "
-              . $sth->rows
-              . " for $house $divnumber on $divdate"
-              if ( $sth->rows != 1 );
+                . $sth->rows
+                . " for $house $divnumber on $divdate"
+                if ($sth->rows != 1);
             PublicWhip::Clean::erase_duff_divisions($dbh);
         }
         else {
-	    # print "There was a difference...\n";
+            # print "There was a difference...\n";
             # We already have the correct division
             return;
         }
@@ -589,17 +616,17 @@ debate_url = ?, source_gid = ?, debate_gid = ?, clock_time = ? where division_id
         (0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", $divdate, $divnumber, $house, $heading, $url,
         $debate_url, $gid, $debate_gid, $motion_text, $clock_time
     );
-    $sth = PublicWhip::DB::query( $dbh, "select last_insert_id()" );
+    $sth = PublicWhip::DB::query($dbh, "select last_insert_id()");
     die "Failed to get last insert id for new division" if $sth->rows != 1;
-    my @data        = $sth->fetchrow_array();
+    my @data = $sth->fetchrow_array();
     my $division_id = $data[0];
 
-    foreach my $mp_id ( keys %$votes ) {
-	# print "Considering mp_id $mp_id\n";
+    foreach my $mp_id (keys %$votes) {
+        # print "Considering mp_id $mp_id\n";
         my $votelist = $votes->{$mp_id};
         foreach my $vote (@$votelist) {
-	    # print "  Considering vote $vote\n";
-	    # print "  Division ID $division_id\n";
+            # print "  Considering vote $vote\n";
+            # print "  Division ID $division_id\n";
             PublicWhip::DB::query(
                 $dbh,
                 "insert into pw_vote (division_id, mp_id, vote) values (?,?,?)",
@@ -613,31 +640,32 @@ debate_url = ?, source_gid = ?, debate_gid = ?, clock_time = ? where division_id
     # Confirm change (this should be done with transactions, but I don't
     # want to get into them as web providers I want to use may not offer
     # support for that db type in mysql)
-    PublicWhip::DB::query( $dbh,
+    PublicWhip::DB::query($dbh,
         "update pw_division set valid = 1 where division_id = ?",
-        $division_id );
-    PublicWhip::Error::log( "Added new division $house $divnumber $heading from XML",
-        $divdate, ERR_IMPORTANT );
+        $division_id);
+    PublicWhip::Error::log("Added new division $house $divnumber $heading from XML",
+        $divdate, PublicWhip::Error::ERR_IMPORTANT);
     $PublicWhip::DivsXML::divisions_changed = 1;
 }
 
 sub loadspmotion {
-    my ( $twig, $motion ) = @_;
+    my ($twig, $motion) = @_;
 
     my %m = ();
     my $spid = $motion->att('spid');
     $m{'spid'} = $spid;
     $m{'date'} = $motion->att('date');
-    $m{'url'}  = $motion->att('url');
+    $m{'url'} = $motion->att('url');
     $m{'text'} = $motion->text;
 
-    if( exists $spmotions{$spid} ) {
-	my $existingref = $spmotions{$spid};
-	push(@{$existingref},\%m);
-    } else {
-	my @newarray = ();
-	push(@newarray,\%m);
-	$spmotions{$spid} = \@newarray;
+    if (exists $spmotions{$spid}) {
+        my $existingref = $spmotions{$spid};
+        push(@{$existingref}, \%m);
+    }
+    else {
+        my @newarray = ();
+        push(@newarray, \%m);
+        $spmotions{$spid} = \@newarray;
     }
 }
 
@@ -648,7 +676,7 @@ my %redirects;
 
 sub loadpeople {
     my $members_location = $PublicWhip::Config::members_location;
-    my $j = decode_json(read_file($members_location. '/people.json'));
+    my $j = decode_json(read_file($members_location . '/people.json'));
     my %posts;
     foreach (@{$j->{posts}}) {
         $posts{$_->{id}} = $_;
@@ -657,33 +685,37 @@ sub loadpeople {
         my ($org_slug, $house);
         if ($_->{post_id}) {
             $org_slug = $posts{$_->{post_id}}{organization_id};
-        } else {
+        }
+        else {
             $org_slug = $_->{organization_id};
         }
         next unless $org_slug; # A redirect
-        if ( $org_slug eq 'house-of-commons' ) {
+        if ($org_slug eq 'house-of-commons') {
             $house = 'commons';
-        } elsif ( $org_slug eq 'scottish-parliament' ) {
+        }
+        elsif ($org_slug eq 'scottish-parliament') {
             $house = 'scotland';
-        } elsif ( $org_slug eq 'house-of-lords' ) {
+        }
+        elsif ($org_slug eq 'house-of-lords') {
             $house = 'lords';
-        } else {
+        }
+        else {
             # MLA who we don't cover
             next;
         }
         push @{$memberships{$_->{person_id}}{$house}}, { id => $_->{id}, start_date => $_->{start_date}, end_date => $_->{end_date} || '9999-12-31' };
     }
     foreach (@{$j->{persons}}) {
-      if ($_->{redirect}) {
-        $redirects{$_->{id}}=$_->{redirect};
-      }
+        if ($_->{redirect}) {
+            $redirects{$_->{id}} = $_->{redirect};
+        }
     }
 }
 
 sub person_to_member {
     my ($pid, $house, $date) = @_;
     if ($redirects{$pid}) {
-        $pid=$redirects{$pid};
+        $pid = $redirects{$pid};
     }
     foreach (@{$memberships{$pid}{$house}}) {
         return $_->{id} if $_->{start_date} le $date && $date le $_->{end_date};

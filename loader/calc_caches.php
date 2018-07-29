@@ -25,6 +25,9 @@ count_div_info();
 current_rankings();
 
 # then we loop through the missing entries and fill them in
+/**
+ *
+ */
 function count_party_stats()
 {
     global $pwpdo;
@@ -54,6 +57,9 @@ function count_party_stats()
 
 
 # party whip calc everything
+/**
+ *
+ */
 function guess_whip_for_all()
 {
     global $pwpdo;
@@ -62,7 +68,7 @@ function guess_whip_for_all()
     $pwpdo->query("DROP TABLE IF EXISTS pw_cache_whip_tmp",array());
     $pwpdo->query("CREATE TABLE pw_cache_whip_tmp (
                        division_id int not null,
-                       party varchar(200) not null,
+                       party varchar(100) not null,
                        aye_votes int not null,
                        aye_tells int not null,
                        no_votes int not null,
@@ -130,7 +136,7 @@ function guess_whip_for_all()
             else
             {
 
-                    if ($house == 'scotland') {
+                    if ($house === 'scotland') {
                             if( ($ayes > $noes) and ($ayes > $abstentions) )
                                     $whip_guess = "aye";
                             else if( ($noes > $ayes) and ($noes > $abstentions) )
@@ -160,14 +166,27 @@ function guess_whip_for_all()
     $pwpdo->query("RENAME TABLE pw_cache_whip_tmp TO pw_cache_whip",array());
 }
 
+/**
+ *
+ */
 function count_mp_info() {
     count_4d_info("pw_cache_mpinfo", "pw_mp.mp_id", "mp_id", "votes_attended", "votes_possible");
 }
 
+/**
+ *
+ */
 function count_div_info() {
     count_4d_info( "pw_cache_divinfo", "pw_division.division_id", "division_id", "turnout", "possible_turnout");
 }
 
+/**
+ * @param $table
+ * @param $group_by
+ * @param $id
+ * @param $votes_attended
+ * @param $votes_possible
+ */
 function count_4d_info( $table, $group_by, $id, $votes_attended, $votes_possible) {
     #print "Creating table $table\n";
     global $pwpdo;
@@ -238,6 +257,9 @@ function count_4d_info( $table, $group_by, $id, $votes_attended, $votes_possible
     $pwpdo->query("RENAME TABLE ${table}_tmp TO $table",array());
 }
 
+/**
+ *
+ */
 function current_rankings() {
     # Create tables to store in
     print '['.date('Y-m-d H:i:s').'] calc_caches: current rankings'.PHP_EOL;
@@ -264,17 +286,31 @@ function current_rankings() {
     do_house_ranking("lords");
 }
 
+/**
+ * @param $a
+ * @param $b
+ * @return int
+ */
 function rebelcomp($a, $b) {
     global $mprebel;
     if ($mprebel[$a] == $mprebel[$b]) return 0;
     return ($mprebel[$a] > $mprebel[$b]) ? -1 : 1;
 }
+
+/**
+ * @param $a
+ * @param $b
+ * @return int
+ */
 function attendcomp($a, $b) {
     global $mpattend;
     if ($mpattend[$a] == $mpattend[$b]) return 0;
     return ($mpattend[$a] > $mpattend[$b]) ? -1 : 1;
 }
 
+/**
+ * @param $house
+ */
 function do_house_ranking($house) {
     global $pwpdo;
     print '['.date('Y-m-d H:i:s').'] calc_caches: do_house_ranking: '.$house.PHP_EOL;

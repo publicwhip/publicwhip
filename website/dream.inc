@@ -6,8 +6,8 @@
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
 
-require_once $toppath . "wiki.inc";
-require_once $toppath . "forummagic.inc";
+require_once __DIR__. '/wiki.inc';
+require_once __DIR__. '/forummagic.inc';
 
 # the equation that should be reused on the different places
 function calc_dreammp_person_distance($nvotessame, $nvotessamestrong,
@@ -46,10 +46,10 @@ function print_dreammp_person_distance($nvotessame, $nvotessamestrong,
     print "<tr class=\"evenstrong\"><td>MP absent</td><td class=\"rebelteller\">$nvotesabsentstrong</td><td>".(25 * $nvotesabsentstrong)."</td><td>".(50 * $nvotesabsentstrong)."</td></tr>";
 
     print "<tr class=\"jobevent\"><td>Less important votes (10 points)</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
-    print "<tr class=\"odd\"><td>MP voted with policy</td><td class=\"teller\">$nvotessame</td><td>".(10*$nvotessame)."</td><td>".(10*$nvotessame)."</td></tr>";
-    print "<tr class=\"odd\"><td>MP voted against policy</td><td class=\"rebel\">$nvotesdiffer</td><td>".(0)."</td><td>".(10*$nvotesdiffer)."</td></tr>";
+    print "<tr><td>MP voted with policy</td><td class=\"teller\">$nvotessame</td><td>".(10*$nvotessame)."</td><td>".(10*$nvotessame)."</td></tr>";
+    print "<tr><td>MP voted against policy</td><td class=\"rebel\">$nvotesdiffer</td><td>".(0)."</td><td>".(10*$nvotesdiffer)."</td></tr>";
     print "<tr class=\"jobevent\"><td>Less important absentees (2 points)</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
-    print "<tr class=\"odd\"><td>MP absent*</td><td class=\"rebelteller\">$nvotesabsent</td><td>".(1 * $nvotesabsent)."</td><td>".(2 * $nvotesabsent)."</td></tr>";
+    print "<tr><td>MP absent*</td><td class=\"rebelteller\">$nvotesabsent</td><td>".(1 * $nvotesabsent)."</td><td>".(2 * $nvotesabsent)."</td></tr>";
 
 /*    print "<tr class=\"odd\"><td>MP voted with policy</td><td class=\"teller\">$nvotessame</td><td>&times;10=".(10*$nvotessame)."</td><td>&times;10=".(10*$nvotessame)."</td></tr>";
     print "<tr class=\"evenstrong\"><td>MP voted with (strong) policy</td><td class=\"teller\">$nvotessamestrong</td><td>&times;50=".(50*$nvotessamestrong)."</td><td>&times;50=".(50*$nvotessamestrong)."</td></tr>";
@@ -371,12 +371,12 @@ function dream_box($dreamid, $dmp_name) {
 background-color: #eeeeee; font-family: Verdana, Arial, Sans-serif;
 margin: 0 0 0 0; border: 1px solid #003300; padding: 0 0 0 0;">
     <div style="text-align: center; background-color: #003300">
-        <a href="http://www.publicwhip.org.uk" style="color: #ffffff">
-            <img src="http://www.publicwhip.org.uk/smallpublicwhip.gif"
+        <a href="https://www.publicwhip.org.uk" style="color: #ffffff">
+            <img src="https://www.publicwhip.org.uk/smallpublicwhip.gif"
                 alt="The Public Whip" border="0" style="float:none">
         </a>
     </div>
-    <form style="text-align: left" action="http://www.publicwhip.org.uk/mp.php" name="pw">
+    <form style="text-align: left" action="https://www.publicwhip.org.uk/mp.php" name="pw">
         <p style="padding: 0 10px 0 10px">
             <b>'.html_scrub($dmp_name).'<br>How did your MP vote?</b>
             <br>Your postcode:

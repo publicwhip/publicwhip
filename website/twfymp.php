@@ -48,7 +48,7 @@
 	# (and whether the first is a constituency or a person)
 	# select a mode for what is displayed
 	# code for the 0th mp def, if it is there.
-    $voter1link = "mp.php?";
+    $voter1link = "/mp.php?";
 	$voter1link .= $mpprop['mpanchor'];
 
 

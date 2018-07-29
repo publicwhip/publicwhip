@@ -5,14 +5,14 @@
 # This is free software, and you are welcome to redistribute it under
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
-
-require_once $toppath . "links.inc";
-require_once $toppath . "parliaments.inc";
+require_once __DIR__.'/parliaments.inc';
+require_once __DIR__.'/links.inc';
 
 
 function print_mpcolumn_headings($columnforms)
 {
-    print "<tr class=\"headings\">";
+    print '<!-- print_mpcolumn_headings -->'.PHP_EOL;
+    print '<tr class="headings">';
     if ($columnforms["hitcounter"])
         print "<td>Hits</td>";
     if ($columnforms["distancetoagreement"])
@@ -38,10 +38,12 @@ function print_mpcolumn_headings($columnforms)
 	if ($columnforms["attendance"])
 	    print "<td>Attendance<br>(<a href=\"/faq.php#clarify\">explain...</a>)</td>";
     print "</tr>";
+    print '<!-- /print_mpcolumn_headings -->'.PHP_EOL;
 }
 
 function print_mp_row($nrows, $row, $name, $href, $colstyle, $showwhich, $friendlk, $columnforms)
 {
+    print '<!-- print_mp_row -->'.PHP_EOL;
     # row colour
     $sclass = "";
     if ($colstyle == "division")
@@ -67,7 +69,7 @@ function print_mp_row($nrows, $row, $name, $href, $colstyle, $showwhich, $friend
             $sclassd = ((($colstyle == "division2invert") == ($dtvote_a == $dtvote_b)) ? "rebel" : "teller");
     }
 
-    print "<tr class=\"".(($nrows % 2 == 1) ? "odd" : "even").$sclass."\">";
+    print '<tr class="'.$sclass.'">';
 
     if ($columnforms["hitcounter"])
         print "<td>".$row["hits"]."</td>"; 
@@ -100,7 +102,7 @@ function print_mp_row($nrows, $row, $name, $href, $colstyle, $showwhich, $friend
 	{
     	print "<td>";
 		if ($row['house'] != 'lords')
-		print "<a href=\"mp.php?mpc=".urlencode($row['constituency'])."&house=".urlencode($row['house'])."\">".$row['constituency']."</a>";
+		print "<a href=\"/mp.php?mpc=".urlencode($row['constituency'])."&house=".urlencode($row['house'])."\">".$row['constituency']."</a>";
     	else
         	print "<i>(Lords)</i>";
 		print "</td>";
@@ -144,6 +146,7 @@ function print_mp_row($nrows, $row, $name, $href, $colstyle, $showwhich, $friend
         print "<td class=\"percent\">".percentise_votes_short($row['votes_attended'], $row['votes_possible'])."</td>";
 
     print "</tr>\n";
+    print '<!-- /print_mp_row -->'.PHP_EOL;
 }
 
 			
@@ -204,7 +207,7 @@ function print_mp_slab( $allRows,$listtype, $bnofavour, $numcolumns, $tooltips, 
                     $wztoolt = $row["favour"]." members of the ".$row["party"]." party voted in favour, ".$row["against"]." against, and ".$row["absent"]." were absent"; 
                 elseif ($listtype == "dreamdistance")
                     $wztoolt = $row["party"]." party.";
-                print "<td class=\"";
+                print '<td>';
                 print $row["party"];
                 print $row["type"] == "party1" ? " partytype" : " partytype2";
                 if ($cc == $numcolumns - 1)
@@ -228,7 +231,7 @@ function print_mp_slab( $allRows,$listtype, $bnofavour, $numcolumns, $tooltips, 
             if ($row['house'] == "lords")
             {
                 $mpname = $row['title']." ".$row['first_name']." ".$row['last_name'];
-                $href = "mp.php?" . link_to_mp($row);
+                $href = "/mp.php?" . link_to_mp($row);
                 if (strlen($mpname) > 22)
                     $mpname = $row['title'][0]." ".$row['first_name']." ".$row['last_name'];
                 if (strlen($mpname) > 18)
@@ -248,14 +251,14 @@ function print_mp_slab( $allRows,$listtype, $bnofavour, $numcolumns, $tooltips, 
             else
             {
                 $mpname = $row['title']." ".$row['first_name']." ".$row['last_name'];
-                $href = "mp.php?" . link_to_mp($row);
+                $href = "/mp.php?" . link_to_mp($row);
                 if (strlen($mpname) > 22)
                     $mpname = $row['first_name'][0]." ".$row['last_name'];
                 if (strlen($mpname) > 18)
                     $mpname = $row['first_name'][0]." ".substr($row['last_name'], 0, 14).".";
 		    }
             $mpname = str_replace(" ", "&nbsp;", $mpname); // also needs to subst the -
-            print "<td class=\"";
+            print '<td>';
 			if ($listtype == "division")
             {
                 print $row["dvote"];
@@ -342,6 +345,7 @@ function print_mp_slab( $allRows,$listtype, $bnofavour, $numcolumns, $tooltips, 
 # ministerial is 'yes' or none.
 function mp_table( $mptabattr)
 {
+    print '<!-- mp_table -->'.PHP_EOL;
     global $bdebug;
     global $parliaments;
     global $pwpdo;
@@ -698,13 +702,14 @@ function mp_table( $mptabattr)
     if ($mptabattr["sortby"] != "glenowen")
         $columnforms["attendance"] = null;
 
-	if ($mptabattr["headings"])
-		print_mpcolumn_headings($columnforms);
+	if ($mptabattr["headings"]) {
+        print_mpcolumn_headings($columnforms);
+    }
 
     # now output a sentence when there is an empty table (in cases where that can happen)
     if (count($allRows) == 0)
 	{
-		print "<tr class=\"even\"><td colspan=\"".count($columnforms)."\">";
+		print "<tr><td colspan=\"".count($columnforms)."\">";
 		if ($colstyle == "division" and $showwhich == "rebels")
         	print "no rebellions";
 		else if ($colstyle == "division2" and $showwhich == "rebels")
@@ -727,7 +732,7 @@ function mp_table( $mptabattr)
 	    foreach ($allRows as $row)
 	    {
 	        $mpname = $row['title']." ".$row['first_name']." ".$row['last_name'];
-	        $href = "mp.php?" . link_to_mp($row);
+	        $href = "/mp.php?" . link_to_mp($row);
 	        $nrows += 1; # number from 1
 	        print_mp_row($nrows, $row, $mpname, $href, $colstyle, $showwhich, $friendlk, $columnforms);
 	    }
@@ -735,13 +740,16 @@ function mp_table( $mptabattr)
 
     # return value
     # find the number of voters which are the same
+    print '<!-- /mp_table -->'.PHP_EOL;
     if ($mptabattr["listtype"] == 'mpdistance' and $mptabattr["limit"])
     {
         $query = "SELECT pw_mp.mp_id as mpid".$aquery["qfrom"].$aquery["qjoin"].$aquery["qwhere"]." AND distance_a = 0";
 
         $allRows=$pwpdo->fetch_all_rows($query,$placeholders);
         $same_voters = count($allRows);
-        if ($same_voters >= $mptabattr["limit"])
+        if ($same_voters >= $mptabattr["limit"]) {
+
             return $same_voters;
+        }
     }
 }

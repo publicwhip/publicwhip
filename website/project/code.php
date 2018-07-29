@@ -53,17 +53,17 @@ go straight to "Running the website locally" below.
 <h2>Getting the source code</h2>
 
 <p><span class="ptitle">Browse</span> - If you're just curious, you can
-<a href="https://bitbucket.org/publicwhip/publicwhip-v1/">browse
+<a href="https://github.com/publicwhip/publicwhip">browse
 the code online</a>.  Look at README.txt in the top level for more information.</p>
 
 <p><span class="ptitle">File download</span> - To use the code,
 download a snapshot.  Go to our <a
-href="https://bitbucket.org/publicwhip/publicwhip-v1/">BitBucket project page</a>,
+href="https://github.com/publicwhip/publicwhip">Github project page</a>,
 and click the Downloads link.</p>
 
-<p><span class="ptitle">From CVS</span> - For the live code-as-we-change-it,
+<p><span class="ptitle">From Git</span> - For the live code-as-we-change-it,
 you can use the version control system Git.  Go to our <a
-href="https://bitbucket.org/publicwhip/publicwhip-v1/">BitBucket project page</a> where you
+href="https://github.com/publicwhip/publicwhip">Github project page</a> where you
 will find the appropriate links to clone the repository.</p>
 
 <p>There is README.txt file with the source code, explaining what is in each
@@ -97,7 +97,24 @@ Tell me if this list is wrong.
 <p>
 
     <p>You will also need the "ttf-bitstream-vera" package for producting graphs.</p>
-    
+
+<p>For Debian 9, the following installation lines should help:<br>
+    <ul>
+    <li><code>sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg</code></li>
+    <li><code>echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list</code></li>
+    <li><code>sudo apt-get update</code></li>
+    <li><code>apt-get install curl software-properties-common apt-transport-https lsb-release ca-certificates
+        gcc build-essentials expat
+        mariadb apache2 snarf tff-bistream-vera
+        libxml-perl libxml-twig-perl libxml-tidy-perl libxml-simple-perl lib-json-perl
+        libfile-slurp-perl libfile-slurp-unicode-perl libfile-slurp-tiny-perl libperl6-slurp-perl
+        libtext-autoformat-perl libunicode-string-perl libxml-rss-perl
+        php7.2-cli php7.2-common
+        php7.2-curl php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-opcache php7.2-readline php7.2-xml
+
+    </code></li>
+</ul>
+</P>
 <p><span class="ptitle">MySQL</span> - Get this database server from <a
 href="http://www.mysql.com">MySQL.com</a>.  You need version 4.0 or above.  After
 installing it you need to set up the instructions to create a database and a

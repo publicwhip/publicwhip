@@ -1,4 +1,6 @@
-<?php require_once "../common.inc";
+<?php
+
+require_once __DIR__."/../common.inc";
 
 # $Id: confirm.php,v 1.12 2006/03/06 19:09:56 frabcus Exp $
 
@@ -7,7 +9,8 @@
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
 
-require_once "../database.inc";
+require_once __DIR__."/../database.inc";
+
 require_once "user.inc";
 
 $email=mysql_real_escape_string($_GET["email"]);
@@ -30,7 +33,7 @@ if ($feedback) {
         if ($return_url) {
             print '<p><a href="'.htmlspecialchars($return_url).'">Continue where you were...</a> when you found you needed a login.';
         } else {
-            print '<p><a href="addpolicy.php">Make your own policies</a>';
+            print '<p><a href="/addpolicy.php">Make your own policies</a>';
             print "<br><a href=\"settings.php\">Account settings</a>";
         }
     }
@@ -45,6 +48,4 @@ if (!$worked){
         <p>Try the <a href="changeemail.php">Change your email
         address</a> page to receive a new confirmation email';
 }
-
-?>
-<?php pw_footer() ?>
+pw_footer();

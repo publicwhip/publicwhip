@@ -6,10 +6,12 @@
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
 
+use lib ".";
 package PublicWhip::DB;
 use strict;
 
 # Copy config.pm.incvs to config.pm and edit it
+
 use PublicWhip::Config;
 use PublicWhip::Error;
 
@@ -21,14 +23,14 @@ sub connect {
         $PublicWhip::Config::dbspec, $PublicWhip::Config::user,
         $PublicWhip::Config::pass, { RaiseError => 1, PrintError => 0 }
       )
-      or die "Couldn't connect to database: " . DBI->errstr;
+      or die "Couldn't connect to database: " . DBI->errstr." Used Spec: ".$PublicWhip::Config::dbspec." and user ".$PublicWhip::Config::user;
     return $dbh;
 }
 
 sub query {
     my $dbh   = shift;
     my $query = shift;
-    PublicWhip::Error::log( "Query: $query Params: @_", "", ERR_CHITTER );
+    PublicWhip::Error::log( "Query: $query Params: @_", "", PublicWhip::Error::ERR_CHITTER );
     my $sth = $dbh->prepare($query)
       or die "Couldn't prepare statement: " . $dbh->errstr . "\n$query";
     $sth->execute(@_)

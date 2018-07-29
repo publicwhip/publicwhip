@@ -1,4 +1,5 @@
-<?php require_once "../common.inc";
+<?php
+require_once __DIR__."/../common.inc";
 # $Id: wiki.php,v 1.36 2008/01/09 17:16:03 publicwhip Exp $
 # vim:sw=4:ts=4:et:nowrap
 
@@ -7,16 +8,16 @@
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
 
-require_once "../database.inc";
-require_once "user.inc";
+require_once __DIR__."/../database.inc";
+require_once __DIR__."/user.inc";
 
-require_once "../db.inc";
-require_once "../cache-tools.inc";
-require_once "../wiki.inc";
-require_once "../pretty.inc";
-require_once "../DifferenceEngine.inc";
-require_once "../divisionvote.inc";
-require_once "../forummagic.inc";
+require_once __DIR__."/../db.inc";
+require_once __DIR__."/../cache-tools.inc";
+require_once __DIR__."/../wiki.inc";
+require_once __DIR__."/../pretty.inc";
+require_once __DIR__."/../DifferenceEngine.inc";
+require_once __DIR__."/../divisionvote.inc";
+require_once __DIR__."/../forummagic.inc";
 $db = new DB(); 
 
 $just_logged_in = do_login_screen();
@@ -110,7 +111,7 @@ if (user_isloggedin()) # User logged in, show settings screen
         story further will know where to look.</p>
 
         <p>
-<?
+<?php
         if ($debate_gid != "") {
             if ($division_details['house'] == 'lords')
                 $link_url = "http://www.theyworkforyou.com/lords/?id=$debate_gid";
@@ -139,7 +140,7 @@ if (user_isloggedin()) # User logged in, show settings screen
         </FORM>
         </P>
         <p><a href="<?php echo get_wiki_history_link($type, $params)?>">View change history</a>
-<?
+<?php
         } else {
             trigger_error("Unknown type for wiki", E_USER_ERROR);
         }
@@ -150,7 +151,7 @@ if (user_isloggedin()) # User logged in, show settings screen
         
       <td width="33%" valign="top">
 
-<?
+<?php
         $discuss_url = "/division-forum.php?date=".$division_details["division_date"].
             "&number=".$division_details["division_number"]."&house=".$division_details["house"];
 ?>
@@ -179,7 +180,7 @@ if (user_isloggedin()) # User logged in, show settings screen
         <li>&lt;blockquote&gt;, &lt;/blockquote&gt; - quoted paragraph
         <li>&lt;i&gt; &lt;/i&gt; - italic
         <li>&lt;b&gt; &lt;/b&gt; - bold
-        <li>&lt;a href="http://..."&gt; &lt;/a&gt; - link
+        <li>&lt;a href="https://..."&gt; &lt;/a&gt; - link
         <li>&lt;ul&gt; &lt;li&gt; item &lt;/li&gt; ... &lt;/ul&gt; - bulleted list
         <li>&lt;ol&gt; &lt;li&gt; item &lt;/li&gt;  ...&lt;/ol&gt; - numbered list
         </ul>
@@ -189,7 +190,7 @@ if (user_isloggedin()) # User logged in, show settings screen
  
 
         </tr></table>
-<?
+<?php
 
     }
     pw_footer();

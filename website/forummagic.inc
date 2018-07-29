@@ -86,7 +86,7 @@ function forummagic_getlink($db, $forum_name, $topic_match) {
     list($forum_id, $topic_id) = forummagic_findtopic($db, $forum_name, $topic_match);
     if (!$topic_id)
         return null;
-    return "/forum/viewtopic.php?t=$topic_id";
+    return '';
 }
 
 // Internal function to find forum and topic id

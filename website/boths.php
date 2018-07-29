@@ -101,7 +101,7 @@ headings to sort it by MP name or by division date.
         $prettyrow = pretty_row_start($prettyrow);
         print '<td>'.$row['division_number'].'</td><td>'.pretty_date($row['division_date']).'</td><td><a href="division.php?date=' . urlencode($row['division_date']) .
         '&number=' . urlencode($row['division_number']) . '">'.$row['division_name'].'</a></td>';
-        print '<td><a href="mp.php?firstname=' . urlencode($row['first_name']) .
+        print '<td><a href="/mp.php?firstname=' . urlencode($row['first_name']) .
             '&lastname=' . urlencode($row['last_name']) . '&constituency=' .
             urlencode($row['constituency']) . '">'.
             $row['first_name'].' '.$row['last_name'].'</a></td> <td>'.$row['constituency'].'</td>

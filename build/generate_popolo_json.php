@@ -1,15 +1,16 @@
 #!/usr/bin/php -q
 <?php
 
-require_once "../website/config.php";
-require_once "../website/db.inc";
-require_once "../website/wiki.inc";
+require_once __DIR__.'/../website/config.php';
+require_once __DIR__.'/../website/db.inc';
+require_once __DIR__.'/../website/wiki.inc';
+
 
 # generate policies - 1 file per policy
 # generate motions - 1 file per policy?
 #
 
-$data_dir = dirname( __FILE__ ) . '/../website/data/';
+$data_dir = __DIR__ . '/../website/data/';
 
 if ( !file_exists($data_dir) && !is_dir($data_dir) ) {
     print "Can't find website data directory: $data_dir\n";

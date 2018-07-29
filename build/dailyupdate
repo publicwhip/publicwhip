@@ -3,7 +3,7 @@
 
 if [ x$LOCKFILE = x ]
 then 
-	 /home/publicwhip/publicwhip-live/build/run-with-lockfile -n /home/publicwhip/parldata/dailyupdate-lockfile $0
+	 /home/publicwhip/www.publicwhip.org.uk/build/run-with-lockfile -n /home/publicwhip/parldata/dailyupdate-lockfile $0
 	if [ $? = 100 ]
 	then
 		echo "Another copy of dailyupdate is already running" 1>&2
@@ -11,8 +11,9 @@ then
 	exit $?
 fi
 
+#FROMDATE=1997-05-01
 #FROMDATE=1999-11-17
-FROMDATE=2012-02-01
+FROMDATE=2018-01-01
 PATH=$PATH:/usr/local/bin:/usr/bin:/bin
 export HOME=/home/publicwhip
 export CVS_RSH=/usr/bin/ssh
@@ -36,11 +37,11 @@ chmod -R a+r /home/publicwhip/parldata
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Updating parlimentary parser"
 # Update members files and the like
 cd ~/parlparse
-# git pull -q
+git pull -q
 
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Loading list of members"
 # Load new list of members and ministers
-cd ~/publicwhip-live/loader
+cd ~/www.publicwhip.org.uk/loader
 ./memxml2db.pl
 
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Loading new divisions"
@@ -58,11 +59,11 @@ echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Calculating cache"
 
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Clearing page cache"
 	# clear page cache
-	cd ~/publicwhip-live/build
+	cd ~/www.publicwhip.org.uk/build
 	./clear-caches
 
     # update 
-    cd ~/publicwhip-live/loader
+    cd ~/www.publicwhip.org.uk/loader
 
     # FIXME: just commenting out these two commands since the
     # next run will take *days* - don't want it to be restarted
@@ -74,7 +75,7 @@ echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Clearing page cache"
     #./division_distance.php
 
 	# export dumps of data
-	cd ~/publicwhip-live/build
+	cd ~/www.publicwhip.org.uk/build
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Export db"
 	./export-db
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Votematrix"
@@ -83,14 +84,14 @@ echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Votematrix"
 
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Copying across ministers"
 # Copy across ministers file (used by minwhirl)
-cp ~/parlparse/members/ministers.json ~/www.publicwhip.org.uk/docs/data/
-cp ~/publicwhip-live/*.txt ~/www.publicwhip.org.uk/docs/data/
-chmod a+r ~/www.publicwhip.org.uk/docs/data/*
+cp ~/parlparse/members/ministers.json ~/www.publicwhip.org.uk/website/data/
+#cp ~/www.publicwhip.org.uk/*.txt ~/www.publicwhip.org.uk/docs/data/
+#chmod a+r ~/www.publicwhip.org.uk/docs/data/*
 
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Starting rss feeds"
 # RSS feeds
-RSSDEST=~/www.publicwhip.org.uk/docs/feeds
-cd ~/publicwhip-live/loader
+RSSDEST=~/www.publicwhip.org.uk/website/feeds
+cd ~/www.publicwhip.org.uk/loader
 
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Interesting divisions"
 ./interestingdivisions2rss.pl > $RSSDEST/interestingdivisions.xml
@@ -98,7 +99,7 @@ echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Interesting divisions"
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: All divisions"
 ./alldivisions2rss.pl > $RSSDEST/alldivisions.xml
 
-cd ~/publicwhip-live/build
+cd ~/www.publicwhip.org.uk/build
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: popolo division data"
 ./generate_popolo_json.php
 

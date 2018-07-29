@@ -1,14 +1,5 @@
 <?php
-// This files used for user login, should be merged with db.inc (patches
-// welcome :)
-//
-// SourceForge: Breaking Down the Barriers to Open Source Development
-// Copyright 1999-2000 (c) The SourceForge Crew
-// http://sourceforge.net
-//
-// $Id: database.inc,v 1.5 2011/05/10 22:54:03 publicwhip Exp $
-//
-// /etc/local.inc includes the machine specific database connect info
+require_once(__DIR__.'/../mysqlshim.php');
 
 function db_connect() {
 	global $pw_host,$pw_user,$pw_password;
@@ -65,5 +56,3 @@ function db_error() {
 //connect to the db
 //I usually call from pre.php
 db_connect();
-
-?>

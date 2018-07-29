@@ -1,6 +1,5 @@
 #!/usr/bin/perl -w
 use strict;
-use lib "PublicWhip";
 
 # Convert all-members.xml and all-lords.xml into the database format for Public
 # Whip website
@@ -9,13 +8,13 @@ use lib "PublicWhip";
 # This is free software, and you are welcome to redistribute it under
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
-
 use XML::Twig;
 use HTML::Entities;
 use Data::Dumper;
 use File::Slurp;
 use JSON;
 
+use lib ".";
 use PublicWhip::Config;
 my $members_location = $PublicWhip::Config::members_location;
 

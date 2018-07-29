@@ -35,7 +35,7 @@
     if (''===$sort) {
         $sort = 'lastname';
     }
-    if (false===in_array($sort,array('lastname','rebellions','party','constituency','attendance'))) {
+    if (false===in_array($sort,array('lastname','rebellions','party','date','constituency','attendance'))) {
         pw_header();
         print '<h1>Invalid sort entered</h1>';
         possiblexss('sort = '.$sort);
@@ -99,7 +99,7 @@
 	function makempslink($rdisplay_parliament, $rdisplay_house, $sort)
 	{
         global $rdefaultdisplay_parliament, $rdefaultdisplay_house;
-		$base = "mps.php";
+		$base = "/mps.php";
         $rest = "";
 		if ($rdisplay_parliament != $rdefaultdisplay_parliament)
 			$rest .= "&parliament=$rdisplay_parliament";

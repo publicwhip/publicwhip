@@ -9,12 +9,15 @@ use strict;
 # This is free software, and you are welcome to redistribute it under
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
-
 use Getopt::Long;
+
+use lib ".";
+use PublicWhip::DB;
 use PublicWhip::Clean;
 use PublicWhip::DivsXML;
 use PublicWhip::DB;
 use PublicWhip::Error;
+
 
 my $from;
 my $to;
@@ -40,9 +43,9 @@ if ($date) {
 $from = "1000-01-01" if not defined $from;
 $to   = "9999-12-31" if not defined $to;
 
-PublicWhip::Error::setverbosity(ERR_IMPORTANT + 1 ) if $quiet;
-PublicWhip::Error::setverbosity(ERR_USEFUL)          if $verbose;
-PublicWhip::Error::setverbosity(ERR_CHITTER)         if $chitter;
+PublicWhip::Error::setverbosity(PublicWhip::Error::ERR_IMPORTANT + 1 ) if $quiet;
+PublicWhip::Error::setverbosity(PublicWhip::Error::ERR_USEFUL)          if $verbose;
+PublicWhip::Error::setverbosity(PublicWhip::Error::ERR_CHITTER)         if $chitter;
 
 if ( $#ARGV < 0 || ( !$result ) ) {
     help();
@@ -95,7 +98,7 @@ END
 
 # Called every time to tidy up database
 sub clean {
-    PublicWhip::Error::log("Erasing half-parsed divisions...", "", ERR_USEFUL);
+    PublicWhip::Error::log("Erasing half-parsed divisions...", "", PublicWhip::Error::ERR_USEFUL);
     PublicWhip::Clean::erase_duff_divisions($dbh);
 }
 
@@ -107,13 +110,13 @@ sub all_divsxml {
 }
 
 sub check {
-    PublicWhip::Error::log("Fixing bothway votes...", "", ERR_USEFUL);
+    PublicWhip::Error::log("Fixing bothway votes...", "", PublicWhip::Error::ERR_USEFUL);
     PublicWhip::Clean::fix_bothway_voters($dbh);
-    PublicWhip::Error::log("Checking integrity...", "", ERR_USEFUL);
+    PublicWhip::Error::log("Checking integrity...", "", PublicWhip::Error::ERR_USEFUL);
     PublicWhip::Clean::check_integrity($dbh, $from, $to);
 }
 
 sub test {
-    PublicWhip::Error::log("Temporary testing code...", "", ERR_USEFUL);
+    PublicWhip::Error::log("Temporary testing code...", "", PublicWhip::Error::ERR_USEFUL);
 }
 

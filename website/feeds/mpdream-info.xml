@@ -1,4 +1,4 @@
-<?php require_once "../common.inc";
+<?php require_once __DIR__.'/../common.inc';
 # $Id: mpdream-info.xml,v 1.4 2007/05/20 04:49:32 publicwhip Exp $
 
 # Print information about all MPs and how they compare to the given
@@ -8,10 +8,9 @@
 # This is free software, and you are welcome to redistribute it under
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
-
-require_once "../db.inc";
-require_once "../parliaments.inc";
-require_once "../dream.inc";
+        require_once __DIR__.'/../db.inc';
+        require_once __DIR__.'/../parliaments.inc';
+        require_once __DIR__.'/../dream.inc';
 
 header("Content-type: text/xml");
 print "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";

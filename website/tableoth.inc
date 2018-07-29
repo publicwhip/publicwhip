@@ -39,7 +39,7 @@
 				if ($thispagesettings)
 					print "<td>
                     ".$mpprop['name']."
-                    <a href=\"mp.php?mpn=".$mpprop['name']."&$thispagesettings\">(show only their votes)</a>
+                    <a href=\"/mp.php?mpn=".$mpprop['name']."&$thispagesettings\">(show only their votes)</a>
                     </td>\n";
 				else
 					print "<td>".$mpprop['name']."</td>\n";
@@ -88,6 +88,7 @@
 	# listlength is 'short' or 'allpublic'
 	function print_policy_table($db, $dreamtabattr)
 	{
+	    print '<!-- print_policy_table -->'.PHP_EOL;
         global $pwpdo;
         $placeholders=array();
 		$qselect = " SELECT name, description, votes_count, private,
@@ -199,7 +200,7 @@
 	        $prettyrow = pretty_row_start($prettyrow);
 	        $dreamid = $row['dream_id'];
 
-            $link = "policy.php?id=$dreamid";
+            $link = "/policy.php?id=$dreamid";
 		    if ($columnforms["hitcounter"])
                 print "<td>".$row["hits"]."</td><td>".$row["mhits"]."</td>"; 
             if ($columnforms["votes"])
@@ -214,7 +215,7 @@
             {
                 $distance = $row['distance'];
                 $agreement = (1.0 - (float)($distance)) * 100.0;
-                $compare_link = "mp.php?".$dreamtabattr["mpanchor"]."&dmp=$dreamid"; 
+                $compare_link = "/mp.php?".$dreamtabattr["mpanchor"]."&dmp=$dreamid";
                 print "<td><b><a href=\"$compare_link\">".number_format($agreement, 0)."%</a></b></td>\n"; 
             }
 			if ($columnforms["policy"])
@@ -238,7 +239,7 @@
 				print "<td>";
 				if ($dreamtabattr["editable"])
 				{
-			        print '<FORM ACTION="policy.php" METHOD="POST"> ';
+			        print '<FORM ACTION="/policy.php" METHOD="POST"> ';
 			        print ' <select name="seldreamid" size="1">
 	            			<option value="'.$dreamid.',no" '.($row['vote_strength'] ? "" : "selected").'>No</option>
 	            			<option value="'.$dreamid.',yes" '.($row['vote_strength'] ? "selected" : "").'>Yes</option>
@@ -254,6 +255,7 @@
 
 	        print "</tr>\n";
   		}
+        print '<!-- /print_policy_table -->'.PHP_EOL;
 
 		return $res;
  	}

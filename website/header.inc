@@ -1,8 +1,10 @@
-<!DOCTYPE HTML>
-<html>
-
-
 <?php
+if (isset($headerAlreadyRan)) {
+    error_log('Header already output');
+    return;
+}
+global $headtitle,$title,$h1title;
+$headerAlreadyRan=true;
 # $Id: header.inc,v 1.105 2011/04/11 13:25:23 publicwhip Exp $
 
 # The Public Whip, Copyright (C) 2003 Francis Irving and Julian Todd
@@ -11,79 +13,35 @@
 # For details see the file LICENSE.html in the top level of the source.
 
 # title bar if not set
-if (!$headtitle)
+if (!isset($headtitle))
 {
     $headtitle = preg_replace("/<[^>]*>/", "", $title);
     $headtitle = preg_replace("/ - /", " &#8212; ", $headtitle." - The Public Whip");
-    if (!$title || ($title == "Counting votes on your behalf"))
-        $headtitle = "The Public Whip &#8212; ".$title;
+    if (!$title) {
+        $title ='Counting votes on your behalf';
+    }
+    $headtitle = "The Public Whip &#8212; ".$title;
 }
-if (!$h1title)
+if (!isset($h1title))
     $h1title = "<h1> ".str_replace(" - ", " &#8212; ", $title)." </h1>";
 
 ?>
+<!DOCTYPE HTML>
+<html>
 
 <head>
 <meta charset="UTF-8">
 
-<link href="/style.css" type="text/css" rel="stylesheet" media="all">
+<link href="/style201807.css" type="text/css" rel="stylesheet" media="all">
 <!--[if IE 7]>
 <link href="/ie7.css" type="text/css" rel="stylesheet" media="all">
 
 <![endif]-->
-<!--
-/*
- * @license
- * MyFonts Webfont Build ID 981839, 2011-08-21T11:30:45-0400
- * 
- * The fonts listed in this notice are subject to the End User License
- * Agreement(s) entered into by the website owner. All other parties are 
- * explicitly restricted from using the Licensed Webfonts(s).
- * 
- * You may obtain a valid license at the URLs below.
- * 
- * Webfont: Museo 700 by exljbris
- * URL: http://new.myfonts.com/fonts/exljbris/museo/700/
- * 
- * Webfont: Museo 300 by exljbris
- * URL: http://new.myfonts.com/fonts/exljbris/museo/300/
- * 
- * 
- * License: http://www.myfonts.com/viewlicense?1056
- * Licensed pageviews: unlimited
- * Webfonts copyright: Copyright (c) 2008 by Jos Buivenga/exljbris. All rights reserved.
- * 
- * © 2011 Bitstream Inc
-*/
 
--->
-<link rel="stylesheet" type="text/css" href="/publicwhip.css">
-<link href="<?php echo $toppath?>publicwhip_print.css" type="text/css" rel="stylesheet" media="print">
-<link rel="icon" href="/<?php echo $favicon?>" type="image/x-icon" />
-<link rel="shortcut icon" href="/<?php echo $favicon?>" type="image/x-icon" />
-<link rel="alternate" type="application/rss+xml" title="RSS" href="http://www.publicwhip.org.uk/feeds/interestingdivisions.xml" />
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-<script type="text/javascript">
-$(document).ready(function() {
-    $('tr').mouseover(function() {
-		$(this).addClass('over');})
-		.mouseout(function() {
-		$(this).removeClass('over');
-	});
-	$('tr:even').addClass('alt');
-});
-</script>
-<script type="text/javascript" src="/publicwhip.js"></script>
+<link href="/publicwhip_print.css" type="text/css" rel="stylesheet" media="print">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://www.publicwhip.org.uk/feeds/interestingdivisions.xml" />
 <title><?php print $headtitle ?></title>
-<?php if( extension_loaded('newrelic') ) { echo newrelic_get_browser_timing_header(); } ?>
 <script type="text/javascript">
-function givefocus(field) {
-    if (!document || !document.getElementById)
-        return
-    f = document.getElementById(field)
-    if (f)
-        f.focus()
-}
 function secondnav_goto() {
     if (!document) return
     if (!document.getElementById) return
@@ -111,16 +69,11 @@ function ClickSup(nsup) {
             sups[i].style.backgroundColor = el.style.backgroundColor;
 }
 </script>
-    <?php
-    if (function_exists('remote_analytics')) {
-        remote_analytics();
-    }
-?>
 </head>
 
-<body onLoad="<?php echo $onload?>">
+<body>
 <div id="whitebox">
-<script type="text/javascript" src="walterzorn/wz_tooltip.js"></script>
+<script type="text/javascript" src="/walterzorn/wz_tooltip.js"></script>
 
 <div id="header" class="widewidth">
 <div class="logo"><a href="/"><img src="/images/logo.jpg" alt="the Public Whip" /></a></div>
@@ -131,35 +84,32 @@ Search: <input maxLength=256 size=12 id="query_head" name="query" onblur="fadeou
 
 <!-- the main site navigation -->
 <div id="nav_main">
-<a title="Front page and site highlights" href="<?php echo $toppath?>index.php">Home</a>
-<a title="List of all votes in Parliament" href="<?php echo $toppath?>divisions.php">Divisions</a>
-<a title="List of all Members of House of Commons" href="<?php echo $toppath?>mps.php">MPs</a>
-<a title="List of all Members of House of Lords" href="<?php echo $toppath?>mps.php?house=lords">Lords</a>
-<a title="List of all Members of the Scottish Parliament" href="<?php echo $toppath?>mps.php?house=scotland">MSPs</a>
-<a title="Help to analyze MP's votes" href="<?php echo $toppath?>policies.php">Policies</a>
-<!-- <a title="Chat with other users" href="/forum">Forum</a> -->
-<a title="Blog" href="http://blog.publicwhip.org.uk">Blog</a>
-<a title="Twitter" href="http://twitter.com/publicwhip">Twitter</a>
-<!-- <a title="Help run the Public Whip project" href="<?php echo $toppath?>project/index.php">Join Us</a> -->
-<a title="Frequently asked questions" href="<?php echo $toppath?>faq.php">Help / FAQ</a>
-
-
+<a title="Front page and site highlights" href="/index.php">Home</a>
+<a title="List of all votes in Parliament" href="/divisions.php">Divisions</a>
+<a title="List of all Members of House of Commons" href="/mps.php">MPs</a>
+<a title="List of all Members of House of Lords" href="/mps.php?house=lords">Lords</a>
+<a title="List of all Members of the Scottish Parliament" href="/mps.php?house=scotland">MSPs</a>
+<a title="Help to analyze MP's votes" href="/policies.php">Policies</a>
+<a title="Twitter" href="https://twitter.com/publicwhip">Twitter</a>
+<!-- <a title="Help run the Public Whip project" href="/project/index.php">Join Us</a> -->
+<a title="Frequently asked questions" href="/faq.php">Help / FAQ</a>
 </div>
+
 </div><!-- end header-->
 <div id="main" class="widewidth"><!-- main content -->
-<?
-print $h1title;  # the actual heading
-?>
+<?php
 
-<?php if ($second_links && $second_type == "default") { ?>
+print $h1title;  # the actual heading
+global $second_links,$second_links2,$second_links3,$second_type;
+
+if (isset($second_links)) {
+    /**
 <!-- the second tier navigation as dropdowns -->
 <!-- add hashes to $second_links array, keys are
      'href' - URL of link
      'text' - displayed text
      'tooltip' - text to put in title
-     'current' - 'on' or 'off' for whether this item is currently selected -->
-
-<?
+     'current' - 'on' or 'off' for whether this item is currently selected --> **/
     function print_links_default($links, $offset) {
         print '<form name="secondnav" action="/redir.php" method="post" style="display: inline">';
         print '<select id="r'.$offset.'" name="r'.$offset.'" onchange="secondnav_goto'.$offset.'()">';
@@ -187,5 +137,4 @@ print $h1title;  # the actual heading
     }
 ?>
 <!-- the second tier navigation as dropdowns end-->
-<?php } ?>
-
+<?php }

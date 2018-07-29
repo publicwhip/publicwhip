@@ -24,7 +24,7 @@ $Output_Values{both}=   '3';
 $Output_Values{no}=     '4';
 $Output_Values{tellno}= '5';
 
-my $path = $ENV{'HOME'} ."/www.publicwhip.org.uk/docs/data";
+my $path = $ENV{'HOME'} ."/www.publicwhip.org.uk/website/data";
 
 # Lords
 my $outfile = "votematrix-lords";

@@ -1,4 +1,4 @@
-<?php require_once "../common.inc";
+<?php require_once __DIR__."/../common.inc";
 # $Id: settings.php,v 1.23 2006/02/27 06:25:19 publicwhip Exp $
 
 # The Public Whip, Copyright (C) 2003 Francis Irving and Julian Todd
@@ -6,9 +6,9 @@
 # certain conditions.  However, it comes with ABSOLUTELY NO WARRANTY.
 # For details see the file LICENSE.html in the top level of the source.
 
-require_once "../database.inc";
+require_once __DIR__."/../database.inc";
 require_once "user.inc";
-require_once "../db.inc";
+require_once __DIR__."/../db.inc";
 $db = new DB(); 
 
 $just_logged_in = do_login_screen();
@@ -35,7 +35,6 @@ if (user_isloggedin()) # User logged in, show settings screen
     }
 
     $title = "Account settings"; 
-    $onload = "givefocus('user_name')";
     pw_header();
 
     if ($feedback && (!$just_logged_in)) {
@@ -60,7 +59,7 @@ if (user_isloggedin()) # User logged in, show settings screen
 	<br><span class="ptitle">Email:</span> ' . user_getemail() . ' (<a href="changeemail.php">change email</a>)
     <br><span class="ptitle">Password:</span> (<a href="changepass.php">change password</a>)
 
-	<FORM ACTION="'. $PHP_SELF .'" METHOD="POST">
+	<FORM ACTION="" METHOD="POST">
     <h2>Newsletter subscription</h2>
 	<INPUT TYPE="checkbox" NAME="newsletter" ' . $newsletter . '>Email newsletter (at most once a month)
 	<INPUT TYPE="SUBMIT" NAME="submit" VALUE="Update">
@@ -77,7 +76,7 @@ if (user_isloggedin()) # User logged in, show settings screen
     $rowarray = $db->fetch_rows_assoc();
     foreach ($rowarray as $row)
     {
-        print '<br><a href="../policy.php?id=' . $row['dream_id'] . '">' . html_scrub($row['name']) . "</a>\n";
+        print '<br><a href="/policy.php?id=' . $row['dream_id'] . '">' . html_scrub($row['name']) . "</a>\n";
         if ($row['private'] == 0)
             print " (public)";
         if ($row['private'] == 1)
@@ -85,11 +84,10 @@ if (user_isloggedin()) # User logged in, show settings screen
         if ($row['private'] == 2)
             print " (provisional)";
     }
-    print '<p>(<a href="addpolicy.php">make a new policy</a>)</p>';
+    print '<p>(<a href="/account/addpolicy.php">make a new policy</a>)</p>';
     pw_footer();
 }
 else # User not logged in, show login screen
 {
     login_screen();
 }
-?>

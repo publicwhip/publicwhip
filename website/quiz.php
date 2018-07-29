@@ -129,7 +129,7 @@ function quiz_form() {
         if ($policy['distance_a'] != null) {
             print " (".number_format((1.0-$policy['distance_a']) * 100, 0). "%)";
         }
-        print " (<a href=\"policy.php?id=" . $policy['dream_id'] . "\">details";
+        print " (<a href=\"/policy.php?id=" . $policy['dream_id'] . "\">details";
         print "</a>)";
         print "<br>";
     #    print $_GET['p'.$issue['dream_id']])
