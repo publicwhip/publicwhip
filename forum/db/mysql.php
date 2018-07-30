@@ -47,21 +47,21 @@ class sql_db
 
 		if($this->persistency)
 		{
-			$this->db_connect_id = @mysql_pconnect($this->server, $this->user, $this->password);
+			$this->db_connect_id = @mysqli_pconnect($this->server, $this->user, $this->password);
 		}
 		else
 		{
-			$this->db_connect_id = @mysql_connect($this->server, $this->user, $this->password);
+			$this->db_connect_id = @mysqli_connect($this->server, $this->user, $this->password);
 		}
 		if($this->db_connect_id)
 		{
 			if($database != "")
 			{
 				$this->dbname = $database;
-				$dbselect = @mysql_select_db($this->dbname);
+				$dbselect = @mysqli_select_db($this->dbname);
 				if(!$dbselect)
 				{
-					@mysql_close($this->db_connect_id);
+					@mysqli_close($this->db_connect_id);
 					$this->db_connect_id = $dbselect;
 				}
 			}
@@ -82,9 +82,9 @@ class sql_db
 		{
 			if($this->query_result)
 			{
-				#@mysql_free_result($this->query_result); # gave warnings
+				#@mysqli_free_result($this->query_result); # gave warnings
 			}
-			$result = @mysql_close($this->db_connect_id);
+			$result = @mysqli_close($this->db_connect_id);
 			return $result;
 		}
 		else
@@ -104,7 +104,7 @@ class sql_db
 		{
 			$this->num_queries++;
 
-			$this->query_result = @mysql_query($query, $this->db_connect_id);
+			$this->query_result = @mysqli_query($query, $this->db_connect_id);
 		}
 		if($this->query_result)
 		{
@@ -129,7 +129,7 @@ class sql_db
 		}
 		if($query_id)
 		{
-			$result = @mysql_num_rows($query_id);
+			$result = @mysqli_num_rows($query_id);
 			return $result;
 		}
 		else
@@ -141,7 +141,7 @@ class sql_db
 	{
 		if($this->db_connect_id)
 		{
-			$result = @mysql_affected_rows($this->db_connect_id);
+			$result = @mysqli_affected_rows($this->db_connect_id);
 			return $result;
 		}
 		else
@@ -157,7 +157,7 @@ class sql_db
 		}
 		if($query_id)
 		{
-			$result = @mysql_num_fields($query_id);
+			$result = @mysqli_num_fields($query_id);
 			return $result;
 		}
 		else
@@ -173,7 +173,7 @@ class sql_db
 		}
 		if($query_id)
 		{
-			$result = @mysql_field_name($query_id, $offset);
+			$result = @mysqli_field_name($query_id, $offset);
 			return $result;
 		}
 		else
@@ -189,7 +189,7 @@ class sql_db
 		}
 		if($query_id)
 		{
-			$result = @mysql_field_type($query_id, $offset);
+			$result = @mysqli_field_type($query_id, $offset);
 			return $result;
 		}
 		else
@@ -205,7 +205,7 @@ class sql_db
 		}
 		if($query_id)
 		{
-			$this->row[intval($query_id)] = @mysql_fetch_array($query_id);
+			$this->row[intval($query_id)] = @mysqli_fetch_array($query_id);
 			return $this->row[intval($query_id)];
 		}
 		else
@@ -223,7 +223,7 @@ class sql_db
 		{
 			unset($this->rowset[intval($query_id)]);
 			unset($this->row[intval($query_id)]);
-			while($this->rowset[intval($query_id)] = @mysql_fetch_array($query_id))
+			while($this->rowset[intval($query_id)] = @mysqli_fetch_array($query_id))
 			{
 				$result[] = $this->rowset[intval($query_id)];
 			}
@@ -244,7 +244,7 @@ class sql_db
 		{
 			if($rownum > -1)
 			{
-				$result = @mysql_result($query_id, $rownum, $field);
+				$result = @mysqli_result($query_id, $rownum, $field);
 			}
 			else
 			{
@@ -281,7 +281,7 @@ class sql_db
 		}
 		if($query_id)
 		{
-			$result = @mysql_data_seek($query_id, $rownum);
+			$result = @mysqli_data_seek($query_id, $rownum);
 			return $result;
 		}
 		else
@@ -292,7 +292,7 @@ class sql_db
 	function sql_nextid(){
 		if($this->db_connect_id)
 		{
-			$result = @mysql_insert_id($this->db_connect_id);
+			$result = @mysqli_insert_id($this->db_connect_id);
 			return $result;
 		}
 		else
@@ -311,7 +311,7 @@ class sql_db
 			unset($this->row[intval($query_id)]);
 			unset($this->rowset[intval($query_id)]);
 
-			@mysql_free_result($query_id);
+			@mysqli_free_result($query_id);
 
 			return true;
 		}
@@ -322,8 +322,8 @@ class sql_db
 	}
 	function sql_error($query_id = 0)
 	{
-		$result["message"] = @mysql_error($this->db_connect_id);
-		$result["code"] = @mysql_errno($this->db_connect_id);
+		$result["message"] = @mysqli_error($this->db_connect_id);
+		$result["code"] = @mysqli_errno($this->db_connect_id);
 
 		return $result;
 	}

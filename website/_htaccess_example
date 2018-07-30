@@ -4,6 +4,9 @@ RewriteCond %{HTTP_HOST} !^(www\.publicwhip\.org\.uk|pw\.live|direct.publicwhip.
 RewriteRule (.*) https://www.publicwhip.org.uk/$1 [R=301,L]
 ErrorDocument 404 /404.php
 
+# exclude admin ip addresses
+RewriteRule ^account.*$ /404.php?error=restrictedAccess [L]
+
 <FilesMatch "^(mp-info.xml|mpdream-info.xml)$">
     AddType application/x-httpd-php .xml
 </FilesMatch>
@@ -38,12 +41,7 @@ RewriteRule ^by-election$ /election_glenrothes2008.php?dash=yes [PT]
 RewriteRule ^fortytwodays$ /fortytwodays.php [PT]
 
 RewriteRule ^forum.*$ /404.php?error=pageRemoved [R=301,L]
-# TheyWorkForYou
-RewriteCond %{REMOTE_ADDR} !^46.43.39.78
-RewriteCond %{REMOTE_ADDR} !^46.43.39.75
-# Bairwell
-RewriteCond %{REMOTE_ADDR} !^84.45.155.58
-RewriteCond expr "%{REMOTE_ADDR} -ipmatch '2001:4D48:AD54:7A00:1D:AAFF:FECC:2EF1/128'"
+# exclude admin ip addresses
 RewriteRule ^account.*$ /404.php?error=restrictedAccount [R=302,L]
 
 # future proofing

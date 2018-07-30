@@ -94,7 +94,7 @@ session_start();
 $_SESSION['toolkitversion'] = '2.1b';
 $_SESSION['toolkit_title'] = '<b><a href="index.php"><font size="5" color="#000000">PHPBB Admin ToolKit '.$_SESSION['toolkitversion'].'</b></font></a><font size="5"> - <a href="http://starfoxtj.no-ip.com/phpbb/toolkit" target="_blank">Starfoxtj</a></font>';
 $_SESSION['toolkit_title_nversion'] = '<b><a href="index.php"><font size="5" color="#000000">PHPBB Admin ToolKit</b></font></a><font size="5"> - <a href="http://starfoxtj.no-ip.com/phpbb/toolkit" target="_blank">Starfoxtj</a></font>';
-$_SESSION['copyrightfooter'] = '<br /><center><hr width="90%"><font size="2">PHPBB Admin ToolKit '.$_SESSION['toolkitversion'].' © 2007 - <a href="mailto:starfoxtj@yahoo.com">Starfoxtj</a></font></center>';
+$_SESSION['copyrightfooter'] = '<br /><center><hr width="90%"><font size="2">PHPBB Admin ToolKit '.$_SESSION['toolkitversion'].' ï¿½ 2007 - <a href="mailto:starfoxtj@yahoo.com">Starfoxtj</a></font></center>';
 
 $phpbb_root_path = './';
 
@@ -110,11 +110,11 @@ if( file_exists( 'config.php' ) )
 	
 	   { 
 	
-		$db = @mysql_connect("$dbhost", "$dbuser", "$dbpasswd")
-		or die( 'Could not connect to database: '.mysql_error() );
+		$db = @mysqli_connect("$dbhost", "$dbuser", "$dbpasswd")
+		or die( 'Could not connect to database: '.mysqli_error() );
 	
-		@mysql_select_db($dbname)
-		or die( 'Could not select database: '.mysql_error() );
+		@mysqli_select_db($dbname)
+		or die( 'Could not select database: '.mysqli_error() );
 	
 	   }
 
@@ -158,9 +158,9 @@ if( file_exists( 'config.php' ) )
 	$phpbb_privmsgs = $table_prefix."privmsgs";
 	$phpbb_privmsgs_text = $table_prefix."privmsgs_text";
 
-	$phpbb_version_result = mysql_query("SELECT * FROM $phpbb_config WHERE config_name='version'")
-	or die( 'MySQL Error: '.mysql_error() );
-	$myrow_phpbb_version = mysql_fetch_array($phpbb_version_result);
+	$phpbb_version_result = mysqli_query("SELECT * FROM $phpbb_config WHERE config_name='version'")
+	or die( 'MySQL Error: '.mysqli_error() );
+	$myrow_phpbb_version = mysqli_fetch_array($phpbb_version_result);
 	$phpbb_version = $myrow_phpbb_version['config_value'];
 
    }
@@ -913,7 +913,7 @@ function safe_sql( $data )
 
 	   {
 
-		$data = mysql_real_escape_string( $data );
+		$data = mysqli_real_escape_string( $data );
 
 	   }
 
@@ -921,7 +921,7 @@ function safe_sql( $data )
 
 	   {
 
-		$data = mysql_escape_string( $data );
+		$data = mysqli_escape_string( $data );
 
 	   }
 
@@ -1117,8 +1117,8 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 	$sql = "SELECT * FROM $phpbb_users WHERE user_id=$user_id LIMIT 1";
 
-	$result = mysql_query($sql);
-	$myrow = mysql_fetch_array($result);
+	$result = mysqli_query($sql);
+	$myrow = mysqli_fetch_array($result);
 
 	$username = safe_sql( $myrow['username'] );
 	$user_level = safe_sql( $myrow['user_level'] );
@@ -1128,8 +1128,8 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 	$sql = "SELECT * FROM $phpbb_users WHERE user_level=1 ORDER BY user_id ASC LIMIT 1";
 
-	$result = mysql_query($sql);
-	$myrow = mysql_fetch_array($result);
+	$result = mysqli_query($sql);
+	$myrow = mysqli_fetch_array($result);
 
 	$admin_id= safe_sql( $myrow['user_id'] );
 
@@ -1150,8 +1150,8 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 	$sql = "SELECT g.group_id FROM $phpbb_user_group ug, $phpbb_groups g WHERE ug.user_id = $user_id AND g.group_id = ug.group_id AND g.group_single_user = 1";
 
-	$result = mysql_query($sql);
-	$row = mysql_fetch_array($result);
+	$result = mysqli_query($sql);
+	$row = mysqli_fetch_array($result);
 	unset( $row[0] ); // Read note directly below about this line:
 
 
@@ -1161,7 +1161,7 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
     	// 	[group_id] => 123
 	// )
 
-	// The mqsql fetch array used in this scrip: $myrow = mysql_fetch_array($result);
+	// The mqsql fetch array used in this scrip: $myrow = mysqli_fetch_array($result);
 	// Returns the following:
 	// Array
 	// (
@@ -1229,18 +1229,18 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 		$sql = "SELECT `post_id` FROM `$phpbb_posts` WHERE `poster_id`=$user_id";
 	
-		if( !$result = mysql_query( $sql ) )
+		if( !$result = mysqli_query( $sql ) )
 	
 		   {
 	
-				die( '<font size="4"><b>Error selecting selecting posts to clear:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+				die( '<font size="4"><b>Error selecting selecting posts to clear:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 	
 		   }
 	
 	
 		// Assings the results of the above query into an array
 	
-		while($myrow = mysql_fetch_array($result))
+		while($myrow = mysqli_fetch_array($result))
 	
 		   {
 	
@@ -1276,11 +1276,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 			// print_r( $marked_posts );
 			// die();
 	
-			if( !$result = mysql_query( $sql ) )
+			if( !$result = mysqli_query( $sql ) )
 		
 			   {
 		
-					die( '<font size="4"><b>Error setting posts to DELETED:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+					die( '<font size="4"><b>Error setting posts to DELETED:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 		
 			   }
 
@@ -1292,11 +1292,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 	
 		$sql = "UPDATE `$phpbb_posts` SET `poster_id`=-1, `post_username`='DELETED' WHERE `poster_id`=$user_id";
 	
-		if( !$result = mysql_query( $sql ) )
+		if( !$result = mysqli_query( $sql ) )
 	
 		   {
 	
-				die( '<font size="4"><b>Error setting poster id to anonymous for deleted user:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+				die( '<font size="4"><b>Error setting poster id to anonymous for deleted user:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 	
 		   }
 	   }
@@ -1310,11 +1310,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 	
 		$sql = "UPDATE `$phpbb_posts` SET `poster_id`=-1, `post_username`='".str_replace( "\\'", "''", addslashes( $username ) )."' WHERE `poster_id`=$user_id";
 	
-		if( !$result = mysql_query( $sql ) )
+		if( !$result = mysqli_query( $sql ) )
 	
 		   {
 	
-				die( '<font size="4"><b>Error setting poster id to anonymous for deleted user:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+				die( '<font size="4"><b>Error setting poster id to anonymous for deleted user:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 	
 		   }
 
@@ -1336,11 +1336,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 		$sql = "UPDATE `$phpbb_topics` SET `topic_title`='DELETED' WHERE `topic_poster`=$user_id";
 
 
-		if( !$result = mysql_query( $sql ) )
+		if( !$result = mysqli_query( $sql ) )
 	
 		   {
 	
-				die( '<font size="4"><b>Error setting topics to DELETED:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+				die( '<font size="4"><b>Error setting topics to DELETED:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 	
 		   }
 
@@ -1349,11 +1349,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 		$sql = "UPDATE `$phpbb_topics` SET `topic_poster`=-1 WHERE `topic_poster`=$user_id";
 	
-		if( !$result = mysql_query( $sql ) )
+		if( !$result = mysqli_query( $sql ) )
 	
 		   {
 	
-				die( '<font size="4"><b>Error setting topic id poster to anonymous for deleted user:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+				die( '<font size="4"><b>Error setting topic id poster to anonymous for deleted user:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 	
 		   }
 	   }
@@ -1367,11 +1367,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 	
 		$sql = "UPDATE `$phpbb_topics` SET `topic_poster`=-1 WHERE `topic_poster`=$user_id";
 	
-		if( !$result = mysql_query( $sql ) )
+		if( !$result = mysqli_query( $sql ) )
 	
 		   {
 	
-				die( '<font size="4"><b>Error setting topic id poster to anonymous for deleted user:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+				die( '<font size="4"><b>Error setting topic id poster to anonymous for deleted user:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 	
 		   }
 
@@ -1386,11 +1386,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 	$sql = "UPDATE `$phpbb_vote_voters` SET `vote_user_id`=-1 WHERE `vote_user_id`=$user_id";
 
-	if( !$result = mysql_query( $sql ) )
+	if( !$result = mysqli_query( $sql ) )
 
 	   {
 
-			die( '<font size="4"><b>Error setting voter ID to anonymous:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+			die( '<font size="4"><b>Error setting voter ID to anonymous:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 
 	   }
 
@@ -1404,18 +1404,18 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 	$sql = "SELECT `group_id` FROM `$phpbb_groups` WHERE `group_moderator`=$user_id";
 
-	if( !$result = mysql_query( $sql ) )
+	if( !$result = mysqli_query( $sql ) )
 
 	   {
 
-			die( '<font size="4"><b>Error selecting groups where user is a moderator:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+			die( '<font size="4"><b>Error selecting groups where user is a moderator:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 
 	   }
 
 
 	// Assings the results of the above query into an array
 
-	while($myrow = mysql_fetch_array($result))
+	while($myrow = mysqli_fetch_array($result))
 
 	   {
 
@@ -1451,11 +1451,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 		// echo $sql;
 		// die();
 
-		if( !$result = mysql_query( $sql ) )
+		if( !$result = mysqli_query( $sql ) )
 
 		   {
 
-			die( '<font size="4"><b>Error setting new group moderator to oldest admin:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+			die( '<font size="4"><b>Error setting new group moderator to oldest admin:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 
 		   }
 
@@ -1470,11 +1470,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 	$sql = "DELETE FROM `$phpbb_users` WHERE `user_id`=$user_id";
 
-	if( !$result = mysql_query( $sql ) )
+	if( !$result = mysqli_query( $sql ) )
 
 	   {
 
-		die( '<font size="4"><b>Error deleting user from users table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+		die( '<font size="4"><b>Error deleting user from users table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 
 	   }
 
@@ -1487,11 +1487,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 	$sql = "DELETE FROM `$phpbb_user_group` WHERE `user_id`=$user_id";
 
-	if( !$result = mysql_query( $sql ) )
+	if( !$result = mysqli_query( $sql ) )
 
 	   {
 
-		die( '<font size="4"><b>Error deleting user from user_group table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+		die( '<font size="4"><b>Error deleting user from user_group table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 
 	   }
 
@@ -1504,11 +1504,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 	 $sql = "DELETE FROM `$phpbb_groups` WHERE `group_id`=".$row['group_id'];
 
-	if( !$result = mysql_query( $sql ) )
+	if( !$result = mysqli_query( $sql ) )
 
 	   {
 
-		die( '<font size="4"><b>Error deleting user\'s group from groups table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+		die( '<font size="4"><b>Error deleting user\'s group from groups table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 
 	   }
 
@@ -1521,11 +1521,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 	$sql = "DELETE FROM  `$phpbb_auth_access` WHERE `group_id`=".$row['group_id'];
 
-	if( !$result = mysql_query( $sql ) )
+	if( !$result = mysqli_query( $sql ) )
 
 	   {
 
-		die( '<font size="4"><b>Error deleting user from auth_access table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+		die( '<font size="4"><b>Error deleting user from auth_access table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 
 	   }
 
@@ -1538,11 +1538,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 	$sql = "DELETE FROM `$phpbb_topics_watch` WHERE `user_id`=$user_id";
 
-	if( !$result = mysql_query( $sql ) )
+	if( !$result = mysqli_query( $sql ) )
 
 	   {
 
-		die( '<font size="4"><b>Error deleting user from topics_watch table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+		die( '<font size="4"><b>Error deleting user from topics_watch table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 
 	   }
 
@@ -1555,11 +1555,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 	$sql = "DELETE FROM `$phpbb_banlist` WHERE `ban_userid`=$user_id";
 
-	if( !$result = mysql_query( $sql ) )
+	if( !$result = mysqli_query( $sql ) )
 
 	   {
 
-		die( '<font size="4"><b>Error deleting user from the banlist table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+		die( '<font size="4"><b>Error deleting user from the banlist table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 
 	   }
 
@@ -1579,11 +1579,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 		$sql = "DELETE FROM `$phpbb_sessions` WHERE `session_user_id`=$user_id";
 	
-		if( !$result = mysql_query( $sql ) )
+		if( !$result = mysqli_query( $sql ) )
 	
 		   {
 	
-			die( '<font size="4"><b>Error deleting user from the sessions table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+			die( '<font size="4"><b>Error deleting user from the sessions table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 	
 		   }
 
@@ -1608,11 +1608,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 		$sql_key_check ="SHOW TABLES LIKE '$phpbb_sessions_keys'";
 
-		if( !$result_key_check = mysql_query( $sql_key_check ) )
+		if( !$result_key_check = mysqli_query( $sql_key_check ) )
 	
 		   {
 	
-				die( '<font size="4"><b>Error selecting session keys table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+				die( '<font size="4"><b>Error selecting session keys table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 	
 		   }
 
@@ -1620,18 +1620,18 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 		// This section actually checks if the table exists, if not it skips
 		// deleting the user from this table
 
-		if( mysql_fetch_array($result_key_check) )
+		if( mysqli_fetch_array($result_key_check) )
 		
 		   {
 		
 
 			$sql = "DELETE FROM `$phpbb_sessions_keys` WHERE `user_id`=$user_id";
 		
-			if( !$result = mysql_query( $sql ) )
+			if( !$result = mysqli_query( $sql ) )
 		
 			   {
 		
-				die( '<font size="4"><b>Error deleting user from the sessions_keys table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+				die( '<font size="4"><b>Error deleting user from the sessions_keys table:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 		
 			   }
 
@@ -1656,11 +1656,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 
 		$sql = "UPDATE `$phpbb_privmsgs` SET `privmsgs_from_userid`=-1 WHERE `privmsgs_from_userid`=$user_id";
 
-		if( !$result = mysql_query( $sql ) )
+		if( !$result = mysqli_query( $sql ) )
 	
 		   {
 	
-			die( '<font size="4"><b>Error setting from PM from_user_id to anonymous:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+			die( '<font size="4"><b>Error setting from PM from_user_id to anonymous:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 	
 		   }
 
@@ -1670,11 +1670,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 		$sql = "UPDATE `$phpbb_privmsgs` SET `privmsgs_to_userid`=-1 WHERE `privmsgs_to_userid`=$user_id";
 
 	
-		if( !$result = mysql_query( $sql ) )
+		if( !$result = mysqli_query( $sql ) )
 	
 		   {
 	
-			die( '<font size="4"><b>Error setting from PM to_user_id to anonymous:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+			die( '<font size="4"><b>Error setting from PM to_user_id to anonymous:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 	
 		   }
 
@@ -1686,11 +1686,11 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 	
 		$sql = "SELECT `privmsgs_id` FROM `$phpbb_privmsgs` WHERE `privmsgs_from_userid`=$user_id OR `privmsgs_to_userid`=$user_id";
 	
-		if( !$result = mysql_query( $sql ) )
+		if( !$result = mysqli_query( $sql ) )
 	
 		   {
 	
-			die( '<font size="4"><b>Error selecting PMs for the user:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+			die( '<font size="4"><b>Error selecting PMs for the user:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 	
 		   }
 	
@@ -1701,7 +1701,7 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 	
 		// This section marks and assigns the resulting PMs into the $marked array
 	
-		while($myrow = mysql_fetch_array($result))
+		while($myrow = mysqli_fetch_array($result))
 	
 		   {
 	
@@ -1741,7 +1741,7 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 			// Debugging info:
 			// echo "<br />$sql";
 	
-			if( !$result = mysql_query( $sql ) )
+			if( !$result = mysqli_query( $sql ) )
 	
 			   {
 	
@@ -1755,7 +1755,7 @@ function delete_user_core( $user_id, $clear_posts = false, $retain_pms = false )
 			// Debugging info:
 			// echo "<br />$sql";
 	
-			if( !$result = mysql_query( $sql ) )
+			if( !$result = mysqli_query( $sql ) )
 	
 			   {
 	
@@ -1854,8 +1854,8 @@ function delete_user( $user_id, $clear_posts = false, $retain_pms = false, $from
 		
 			$sql = "SELECT * FROM $phpbb_users WHERE user_id=$id LIMIT 1";
 		
-			$result = mysql_query($sql);
-			$myrow = mysql_fetch_array($result);
+			$result = mysqli_query($sql);
+			$myrow = mysqli_fetch_array($result);
 		
 			$username = safe_sql( $myrow['username'] );
 			$user_level = safe_sql( $myrow['user_level'] );
@@ -1865,8 +1865,8 @@ function delete_user( $user_id, $clear_posts = false, $retain_pms = false, $from
 		
 			$sql = "SELECT * FROM $phpbb_users WHERE user_level=1 ORDER BY user_id ASC LIMIT 1";
 		
-			$result = mysql_query($sql);
-			$myrow = mysql_fetch_array($result);
+			$result = mysqli_query($sql);
+			$myrow = mysqli_fetch_array($result);
 		
 			$admin_id= safe_sql( $myrow['user_id'] );
 		
@@ -1954,8 +1954,8 @@ function delete_user( $user_id, $clear_posts = false, $retain_pms = false, $from
 	
 		$sql = "SELECT * FROM $phpbb_users WHERE user_id=$user_id LIMIT 1";
 	
-		$result = mysql_query($sql);
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query($sql);
+		$myrow = mysqli_fetch_array($result);
 	
 		$username = safe_sql( $myrow['username'] );
 		$user_level = safe_sql( $myrow['user_level'] );
@@ -1965,8 +1965,8 @@ function delete_user( $user_id, $clear_posts = false, $retain_pms = false, $from
 	
 		$sql = "SELECT * FROM $phpbb_users WHERE user_level=1 ORDER BY user_id ASC LIMIT 1";
 	
-		$result = mysql_query($sql);
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query($sql);
+		$myrow = mysqli_fetch_array($result);
 	
 		$admin_id= safe_sql( $myrow['user_id'] );
 	
@@ -2359,8 +2359,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 	   {
 
-		$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_id='-1'");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_id='-1'");
+		$myrow = mysqli_fetch_array($result);
 
 		if( !isset( $myrow['user_id'] ) )
 
@@ -2368,7 +2368,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 			// echo 'User not found';
 
-			mysql_query("INSERT INTO $phpbb_users VALUES ( -1, 0, 'Anonymous', '', 0, 0, 0, 1093148721, 0, 0, '0.00', NULL, '', '', 0, 0, 0, NULL, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, NULL, '', 0, '', '', '', '', '', NULL, '', '', '', '', '', '', '')");
+			mysqli_query("INSERT INTO $phpbb_users VALUES ( -1, 0, 'Anonymous', '', 0, 0, 0, 1093148721, 0, 0, '0.00', NULL, '', '', 0, 0, 0, NULL, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, NULL, '', 0, '', '', '', '', '', NULL, '', '', '', '', '', '', '')");
 			header( "Location: $index" );
 
 		   }
@@ -2482,11 +2482,11 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 				$sql = "UPDATE `$phpbb_users` SET `user_regdate`=$time WHERE `user_id`=$user_id";
 
-				if( !$result = mysql_query( $sql ) )
+				if( !$result = mysqli_query( $sql ) )
 			
 				   {
 			
-						die( '<font size="4"><b>Error updating user\'s join date:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+						die( '<font size="4"><b>Error updating user\'s join date:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 			
 				   }
 
@@ -2620,7 +2620,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 					   }
 
 	
-					mysql_query("UPDATE $phpbb_users SET
+					mysqli_query("UPDATE $phpbb_users SET
 
 					username='$edituser_username',
 					user_email='$edituser_email',
@@ -2648,7 +2648,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 					   {
 
-						mysql_query("UPDATE $phpbb_users SET user_actkey='' WHERE user_id=$edit_user_id");
+						mysqli_query("UPDATE $phpbb_users SET user_actkey='' WHERE user_id=$edit_user_id");
 
 					   }
 
@@ -2658,7 +2658,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 						$passhash = safe_sql( $_POST['edituser_newhash'] );
 
-						mysql_query("UPDATE $phpbb_users SET user_password='$passhash' WHERE user_id=$edit_user_id");
+						mysqli_query("UPDATE $phpbb_users SET user_password='$passhash' WHERE user_id=$edit_user_id");
 
 					   }
 	
@@ -2675,7 +2675,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 							// Hash a new password
 							$newpasshash = md5( $newpass );
 	
-							mysql_query("UPDATE $phpbb_users SET user_password='$newpasshash' WHERE user_id=$edit_user_id");
+							mysqli_query("UPDATE $phpbb_users SET user_password='$newpasshash' WHERE user_id=$edit_user_id");
 	
 						   }
 	
@@ -2719,7 +2719,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 				   { //3.1.1.3
 
 				$edituser_posts = $_POST['edituser_posts'];
-				mysql_query("UPDATE $phpbb_users SET user_level='$user_level', user_posts='$edituser_posts' WHERE user_id=$edit_user_id");
+				mysqli_query("UPDATE $phpbb_users SET user_level='$user_level', user_posts='$edituser_posts' WHERE user_id=$edit_user_id");
 
 				   } //3.1.1.3
 
@@ -2728,7 +2728,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 				   { //3.1.1.4
 
 				$edituser_posts = $_POST['edituser_posts'];
-				mysql_query("UPDATE $phpbb_users SET user_posts='$edituser_posts' WHERE user_id=$edit_user_id");
+				mysqli_query("UPDATE $phpbb_users SET user_posts='$edituser_posts' WHERE user_id=$edit_user_id");
 
 				   } //3.1.1.4
 
@@ -2747,7 +2747,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 				$edit_user_id = $_POST['edit_user_id'];
 				$edituser_posts = $_POST['edituser_posts'];
 
-				mysql_query("UPDATE $phpbb_users SET user_posts='$edituser_posts' WHERE user_id=$edit_user_id");
+				mysqli_query("UPDATE $phpbb_users SET user_posts='$edituser_posts' WHERE user_id=$edit_user_id");
 
 			   } // 3.1.2
 
@@ -2768,8 +2768,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 		$username = $_POST['banspecificuser'];
 
-		$result = mysql_query("SELECT * FROM $phpbb_users WHERE username='$username'");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_users WHERE username='$username'");
+		$myrow = mysqli_fetch_array($result);
 
 		$user_id = $myrow['user_id'];
 
@@ -2782,11 +2782,11 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 		   }
 
-		$result = mysql_query("SELECT * FROM $phpbb_banlist WHERE ban_userid='$user_id'");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_banlist WHERE ban_userid='$user_id'");
+		$myrow = mysqli_fetch_array($result);
 		
-		mysql_query("INSERT INTO $phpbb_banlist (ban_userid) VALUES ('$user_id')");
-		mysql_query("UPDATE $phpbb_sessions SET session_logged_in=0 WHERE session_user_id=$user_id");
+		mysqli_query("INSERT INTO $phpbb_banlist (ban_userid) VALUES ('$user_id')");
+		mysqli_query("UPDATE $phpbb_sessions SET session_logged_in=0 WHERE session_user_id=$user_id");
 		header( "Location: $index?mode=banlist" );
 
 	   } //3.2-1-0
@@ -2798,7 +2798,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 		$email = $_POST['banspecificemail'];
 		
-		mysql_query("INSERT INTO $phpbb_banlist ( ban_email) VALUES ('$email')");
+		mysqli_query("INSERT INTO $phpbb_banlist ( ban_email) VALUES ('$email')");
 		header( "Location: $index?mode=banlist#email" );
 
 	   } //3.2-1-1
@@ -2857,8 +2857,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 				   { //3.2.4.1-2
 
-					mysql_query("INSERT INTO $phpbb_banlist (ban_userid) VALUES ('$edit_user_id')");
-					mysql_query("UPDATE $phpbb_sessions SET session_logged_in=0 WHERE session_user_id=$edit_user_id");
+					mysqli_query("INSERT INTO $phpbb_banlist (ban_userid) VALUES ('$edit_user_id')");
+					mysqli_query("UPDATE $phpbb_sessions SET session_logged_in=0 WHERE session_user_id=$edit_user_id");
 
 				   } //3.2.4.1-2
 
@@ -2878,7 +2878,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 				   } //3.2.4.2.1
 
 
-				mysql_query("DELETE FROM $phpbb_banlist WHERE ban_userid=$edit_user_id");
+				mysqli_query("DELETE FROM $phpbb_banlist WHERE ban_userid=$edit_user_id");
 
 			   } //3.2.4.2
 
@@ -2889,7 +2889,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 				$ban_id = $_GET['unban_banlist'];
 
-				mysql_query("DELETE FROM $phpbb_banlist WHERE ban_id=$ban_id");
+				mysqli_query("DELETE FROM $phpbb_banlist WHERE ban_id=$ban_id");
 				header( "Location: $index?mode=banlist#ip" );
 
 			   }
@@ -2915,8 +2915,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 	$user_id = -1;
 
-	$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_id='$user_id'");
-	$myrow = mysql_fetch_array($result);
+	$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_id='$user_id'");
+	$myrow = mysqli_fetch_array($result);
 
 	if( !isset( $myrow['user_id'] ) )
 
@@ -2996,32 +2996,32 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		$override_user_style = safe_sql( $_POST['override_user_style'] );
 
 
-		mysql_query("UPDATE $phpbb_config SET config_value='$server_name' WHERE config_name='server_name'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$server_port' WHERE config_name='server_port'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$script_path' WHERE config_name='script_path'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$sitename' WHERE config_name='sitename'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$site_desc' WHERE config_name='site_desc'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$board_disable' WHERE config_name='board_disable'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$require_activation' WHERE config_name='require_activation'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$board_email_form' WHERE config_name='board_email_form'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$gzip_compress' WHERE config_name='gzip_compress'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$prune_enable' WHERE config_name='prune_enable'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$server_name' WHERE config_name='server_name'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$server_port' WHERE config_name='server_port'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$script_path' WHERE config_name='script_path'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$sitename' WHERE config_name='sitename'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$site_desc' WHERE config_name='site_desc'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$board_disable' WHERE config_name='board_disable'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$require_activation' WHERE config_name='require_activation'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$board_email_form' WHERE config_name='board_email_form'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$gzip_compress' WHERE config_name='gzip_compress'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$prune_enable' WHERE config_name='prune_enable'");
 
-		mysql_query("UPDATE $phpbb_config SET config_value='$cookie_domain' WHERE config_name='cookie_domain'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$cookie_name' WHERE config_name='cookie_name'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$cookie_path' WHERE config_name='cookie_path'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$cookie_secure' WHERE config_name='cookie_secure'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$session_length' WHERE config_name='session_length'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$cookie_domain' WHERE config_name='cookie_domain'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$cookie_name' WHERE config_name='cookie_name'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$cookie_path' WHERE config_name='cookie_path'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$cookie_secure' WHERE config_name='cookie_secure'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$session_length' WHERE config_name='session_length'");
 
-		mysql_query("UPDATE $phpbb_config SET config_value='$board_email' WHERE config_name='board_email'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$board_email_sig' WHERE config_name='board_email_sig'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$smtp_delivery' WHERE config_name='smtp_delivery'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$smtp_host' WHERE config_name='smtp_host'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$smtp_username' WHERE config_name='smtp_username'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$smtp_password' WHERE config_name='smtp_password'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$board_email' WHERE config_name='board_email'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$board_email_sig' WHERE config_name='board_email_sig'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$smtp_delivery' WHERE config_name='smtp_delivery'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$smtp_host' WHERE config_name='smtp_host'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$smtp_username' WHERE config_name='smtp_username'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$smtp_password' WHERE config_name='smtp_password'");
 
-		mysql_query("UPDATE $phpbb_config SET config_value='$default_style' WHERE config_name='default_style'");
-		mysql_query("UPDATE $phpbb_config SET config_value='$override_user_style' WHERE config_name='override_user_style'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$default_style' WHERE config_name='default_style'");
+		mysqli_query("UPDATE $phpbb_config SET config_value='$override_user_style' WHERE config_name='override_user_style'");
 
 
 		if( isset( $_POST['reset_subsilver'] ) && $_POST['reset_subsilver'] == 1 )
@@ -3032,11 +3032,11 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 
 
-			mysql_query("DELETE FROM phpbb_themes WHERE themes_id='$reset_subsilver_id' LIMIT 1") or die( 'Could not delete phpbb_themes on subsilver reset!');
-			mysql_query("DELETE FROM phpbb_themes_name WHERE themes_id='$reset_subsilver_id' LIMIT 1") or die( 'Could not delete phpbb_themes on subsilver reset!');
+			mysqli_query("DELETE FROM phpbb_themes WHERE themes_id='$reset_subsilver_id' LIMIT 1") or die( 'Could not delete phpbb_themes on subsilver reset!');
+			mysqli_query("DELETE FROM phpbb_themes_name WHERE themes_id='$reset_subsilver_id' LIMIT 1") or die( 'Could not delete phpbb_themes on subsilver reset!');
 
-			mysql_query("INSERT INTO $phpbb_themes (themes_id, template_name, style_name, head_stylesheet, body_background, body_bgcolor, body_text, body_link, body_vlink, body_alink, body_hlink, tr_color1, tr_color2, tr_color3, tr_class1, tr_class2, tr_class3, th_color1, th_color2, th_color3, th_class1, th_class2, th_class3, td_color1, td_color2, td_color3, td_class1, td_class2, td_class3, fontface1, fontface2, fontface3, fontsize1, fontsize2, fontsize3, fontcolor1, fontcolor2, fontcolor3, span_class1, span_class2, span_class3) VALUES ('$reset_subsilver_id', 'subSilver', 'subSilver', 'subSilver.css', '', 'E5E5E5', '000000', '006699', '5493B4', '', 'DD6900', 'EFEFEF', 'DEE3E7', 'D1D7DC', '', '', '', '98AAB1', '006699', 'FFFFFF', 'cellpic1.gif', 'cellpic3.gif', 'cellpic2.jpg', 'FAFAFA', 'FFFFFF', '', 'row1', 'row2', '', 'Verdana, Arial, Helvetica, sans-serif', 'Trebuchet MS', 'Courier, \'Courier New\', sans-serif', 10, 11, 12, '444444', '006600', 'FFA34F', '', '', '')") or die( 'Could not update phpbb_themes on subsilver reset!');
-			mysql_query("INSERT INTO $phpbb_themes_name (themes_id, tr_color1_name, tr_color2_name, tr_color3_name, tr_class1_name, tr_class2_name, tr_class3_name, th_color1_name, th_color2_name, th_color3_name, th_class1_name, th_class2_name, th_class3_name, td_color1_name, td_color2_name, td_color3_name, td_class1_name, td_class2_name, td_class3_name, fontface1_name, fontface2_name, fontface3_name, fontsize1_name, fontsize2_name, fontsize3_name, fontcolor1_name, fontcolor2_name, fontcolor3_name, span_class1_name, span_class2_name, span_class3_name) VALUES ('$reset_subsilver_id', 'The lightest row colour', 'The medium row color', 'The darkest row colour', '', '', '', 'Border round the whole page', 'Outer table border', 'Inner table border', 'Silver gradient picture', 'Blue gradient picture', 'Fade-out gradient on index', 'Background for quote boxes', 'All white areas', '', 'Background for topic posts', '2nd background for topic posts', '', 'Main fonts', 'Additional topic title font', 'Form fonts', 'Smallest font size', 'Medium font size', 'Normal font size (post body etc)', 'Quote & copyright text', 'Code text colour', 'Main table header text colour', '', '', '')") or die( 'Could not phpbb_themes_name on subsilver reset!');
+			mysqli_query("INSERT INTO $phpbb_themes (themes_id, template_name, style_name, head_stylesheet, body_background, body_bgcolor, body_text, body_link, body_vlink, body_alink, body_hlink, tr_color1, tr_color2, tr_color3, tr_class1, tr_class2, tr_class3, th_color1, th_color2, th_color3, th_class1, th_class2, th_class3, td_color1, td_color2, td_color3, td_class1, td_class2, td_class3, fontface1, fontface2, fontface3, fontsize1, fontsize2, fontsize3, fontcolor1, fontcolor2, fontcolor3, span_class1, span_class2, span_class3) VALUES ('$reset_subsilver_id', 'subSilver', 'subSilver', 'subSilver.css', '', 'E5E5E5', '000000', '006699', '5493B4', '', 'DD6900', 'EFEFEF', 'DEE3E7', 'D1D7DC', '', '', '', '98AAB1', '006699', 'FFFFFF', 'cellpic1.gif', 'cellpic3.gif', 'cellpic2.jpg', 'FAFAFA', 'FFFFFF', '', 'row1', 'row2', '', 'Verdana, Arial, Helvetica, sans-serif', 'Trebuchet MS', 'Courier, \'Courier New\', sans-serif', 10, 11, 12, '444444', '006600', 'FFA34F', '', '', '')") or die( 'Could not update phpbb_themes on subsilver reset!');
+			mysqli_query("INSERT INTO $phpbb_themes_name (themes_id, tr_color1_name, tr_color2_name, tr_color3_name, tr_class1_name, tr_class2_name, tr_class3_name, th_color1_name, th_color2_name, th_color3_name, th_class1_name, th_class2_name, th_class3_name, td_color1_name, td_color2_name, td_color3_name, td_class1_name, td_class2_name, td_class3_name, fontface1_name, fontface2_name, fontface3_name, fontsize1_name, fontsize2_name, fontsize3_name, fontcolor1_name, fontcolor2_name, fontcolor3_name, span_class1_name, span_class2_name, span_class3_name) VALUES ('$reset_subsilver_id', 'The lightest row colour', 'The medium row color', 'The darkest row colour', '', '', '', 'Border round the whole page', 'Outer table border', 'Inner table border', 'Silver gradient picture', 'Blue gradient picture', 'Fade-out gradient on index', 'Background for quote boxes', 'All white areas', '', 'Background for topic posts', '2nd background for topic posts', '', 'Main fonts', 'Additional topic title font', 'Form fonts', 'Smallest font size', 'Medium font size', 'Normal font size (post body etc)', 'Quote & copyright text', 'Code text colour', 'Main table header text colour', '', '', '')") or die( 'Could not phpbb_themes_name on subsilver reset!');
 
 
 		   }
@@ -3087,11 +3087,11 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 			$sql = "UPDATE `$phpbb_config` SET `config_value`=$time WHERE `config_name`='board_startdate'";
 
-			if( !$result = mysql_query( $sql ) )
+			if( !$result = mysqli_query( $sql ) )
 		
 			   {
 		
-					die( '<font size="4"><b>Error updating board\'s start date:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+					die( '<font size="4"><b>Error updating board\'s start date:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 		
 			   }
 
@@ -3124,8 +3124,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		$username = str_replace( '*', '%', $_POST['editspecificuser'] );
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_users WHERE username='$username'");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_users WHERE username='$username'");
+		$myrow = mysqli_fetch_array($result);
 		
 		$index = $_SERVER['PHP_SELF'];
 		$user_id = $myrow['user_id'];
@@ -3203,11 +3203,11 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 				$user_id = $_GET['resync'];
 
-				$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
-				$myrow = mysql_fetch_array($result);
+				$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
+				$myrow = mysqli_fetch_array($result);
 
-				$user_post_count_result = mysql_query("SELECT * FROM $phpbb_posts WHERE poster_id=$user_id");
-				$user_post_count = mysql_num_rows($user_post_count_result);
+				$user_post_count_result = mysqli_query("SELECT * FROM $phpbb_posts WHERE poster_id=$user_id");
+				$user_post_count = mysqli_num_rows($user_post_count_result);
 
 			   }
 
@@ -3217,8 +3217,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 				$user_id = $_GET['user_id'];
 
-				$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
-				$myrow = mysql_fetch_array($result);
+				$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
+				$myrow = mysqli_fetch_array($result);
 
 			   }
 
@@ -3249,11 +3249,11 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 			   }
 
-			$bantable = mysql_query("SELECT * FROM $phpbb_banlist WHERE ban_userid=$user_id");
+			$bantable = mysqli_query("SELECT * FROM $phpbb_banlist WHERE ban_userid=$user_id");
 
 			$banstat = 'no';
 
-			$banrow = mysql_fetch_array($bantable);
+			$banrow = mysqli_fetch_array($bantable);
 
 			if( isset( $banrow['ban_userid'] ) )
 
@@ -3282,8 +3282,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 			   {
 
-				$avatar_result = mysql_query("SELECT * FROM $phpbb_config WHERE config_name='avatar_path'");
-				$myrowavatar = mysql_fetch_array($avatar_result);
+				$avatar_result = mysqli_query("SELECT * FROM $phpbb_config WHERE config_name='avatar_path'");
+				$myrowavatar = mysqli_fetch_array($avatar_result);
 				$avatar_path = $myrowavatar['config_value'].'/';
 
 			   }
@@ -3300,8 +3300,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 			   {
 				
-				$avatar_result = mysql_query("SELECT * FROM $phpbb_config WHERE config_name='avatar_gallery_path'");
-				$myrowavatar = mysql_fetch_array($avatar_result);
+				$avatar_result = mysqli_query("SELECT * FROM $phpbb_config WHERE config_name='avatar_gallery_path'");
+				$myrowavatar = mysqli_fetch_array($avatar_result);
 				$avatar_path = $myrowavatar['config_value'].'/';
 
 			   }
@@ -3839,9 +3839,9 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		
 							// Begin Rank Listings
 		
-							$rankresult = mysql_query("SELECT * FROM $phpbb_ranks ORDER BY rank_id ASC");
+							$rankresult = mysqli_query("SELECT * FROM $phpbb_ranks ORDER BY rank_id ASC");
 		
-							while( $rankmyrow = mysql_fetch_array($rankresult) )
+							while( $rankmyrow = mysqli_fetch_array($rankresult) )
 		
 							   {
 		
@@ -4057,8 +4057,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 				   {
 
 					$desc_id = safe_sql( $_GET['sanitize'] );
-					$result = mysql_query("SELECT * FROM $phpbb_config WHERE config_name='site_desc' LIMIT 1");
-					$myrow = mysql_fetch_array($result);
+					$result = mysqli_query("SELECT * FROM $phpbb_config WHERE config_name='site_desc' LIMIT 1");
+					$myrow = mysqli_fetch_array($result);
 	
 	
 					// Sanitize forum_desc
@@ -4066,7 +4066,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 	
 	
 	
-					mysql_query("UPDATE $phpbb_config SET config_value='$desc' WHERE config_name='site_desc' LIMIT 1");
+					mysqli_query("UPDATE $phpbb_config SET config_value='$desc' WHERE config_name='site_desc' LIMIT 1");
 
 				   }
 
@@ -4076,8 +4076,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		
 	
 					$desc_id = safe_sql( $_GET['sanitize'] );
-					$result = mysql_query("SELECT * FROM $phpbb_forums WHERE forum_id='$desc_id' ORDER BY forum_name ASC LIMIT 1");
-					$myrow = mysql_fetch_array($result);
+					$result = mysqli_query("SELECT * FROM $phpbb_forums WHERE forum_id='$desc_id' ORDER BY forum_name ASC LIMIT 1");
+					$myrow = mysqli_fetch_array($result);
 	
 	
 					// Check if forum exists
@@ -4096,7 +4096,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 	
 	
 	
-					mysql_query("UPDATE $phpbb_forums SET forum_desc='$desc' WHERE forum_id=$desc_id LIMIT 1");
+					mysqli_query("UPDATE $phpbb_forums SET forum_desc='$desc' WHERE forum_id=$desc_id LIMIT 1");
 
 				   }
 
@@ -4326,8 +4326,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 
 				// Get PHPBB version from the database
-				$result = mysql_query("SELECT * FROM $phpbb_config WHERE config_name='version' LIMIT 1");
-				$myrow = mysql_fetch_array($result);
+				$result = mysqli_query("SELECT * FROM $phpbb_config WHERE config_name='version' LIMIT 1");
+				$myrow = mysqli_fetch_array($result);
 				$version['current'] = '2'.$myrow['config_value'];
 
 
@@ -4681,9 +4681,9 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		
 				<?php
 	
-				$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_level=1 ORDER BY username ASC");
+				$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_level=1 ORDER BY username ASC");
 	
-				while( $myrow = mysql_fetch_array($result) )
+				while( $myrow = mysqli_fetch_array($result) )
 		
 				   { //3.10
 		
@@ -4731,11 +4731,11 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 	
 			
 					$user_id = $myrow['user_id'];
-					$bantable = mysql_query("SELECT * FROM $phpbb_banlist WHERE ban_userid=$user_id");
+					$bantable = mysqli_query("SELECT * FROM $phpbb_banlist WHERE ban_userid=$user_id");
 	
 		
 					$banstat = '-';
-					$banrow = mysql_fetch_array($bantable);
+					$banrow = mysqli_fetch_array($bantable);
 	
 		
 					if( isset( $banrow['ban_userid'] ) )
@@ -4912,9 +4912,9 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		
 				<?php
 	
-				$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_level=2 ORDER BY username ASC");
+				$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_level=2 ORDER BY username ASC");
 	
-				while( $myrow = mysql_fetch_array($result) )
+				while( $myrow = mysqli_fetch_array($result) )
 		
 				   { //3.10
 		
@@ -4962,11 +4962,11 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 	
 			
 					$user_id = $myrow['user_id'];
-					$bantable = mysql_query("SELECT * FROM $phpbb_banlist WHERE ban_userid=$user_id");
+					$bantable = mysqli_query("SELECT * FROM $phpbb_banlist WHERE ban_userid=$user_id");
 	
 		
 					$banstat = '-';
-					$banrow = mysql_fetch_array($bantable);
+					$banrow = mysqli_fetch_array($bantable);
 	
 		
 					if( isset( $banrow['ban_userid'] ) )
@@ -5206,10 +5206,10 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 
 				// Get forum names and descriptions
-				$result = mysql_query("SELECT * FROM $phpbb_config WHERE config_name='site_desc' LIMIT 1");
+				$result = mysqli_query("SELECT * FROM $phpbb_config WHERE config_name='site_desc' LIMIT 1");
 
 
-				$myrow = mysql_fetch_array($result);
+				$myrow = mysqli_fetch_array($result);
 
 				// Assign orig desc to variable
 				$desc['orig'] = $myrow['config_value'];
@@ -5373,10 +5373,10 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 
 				// Get forum names and descriptions
-				$result = mysql_query("SELECT * FROM $phpbb_forums ORDER BY forum_name ASC");
+				$result = mysqli_query("SELECT * FROM $phpbb_forums ORDER BY forum_name ASC");
 
 
-				while( $myrow = mysql_fetch_array($result) )
+				while( $myrow = mysqli_fetch_array($result) )
 
 				   {
 
@@ -5500,9 +5500,9 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 		// echo 'Would normaly list the Board config page.<br /><a href="'.$_SERVER['PHP_SELF'].'">Back</a>';
 
-		// Orig info from forum: $result = mysql_query("SELECT config_name AS name, config_value AS val FROM $phpbb_config");
+		// Orig info from forum: $result = mysqli_query("SELECT config_name AS name, config_value AS val FROM $phpbb_config");
 		//
-		// while ( $myrow = mysql_fetch_assoc($result) )
+		// while ( $myrow = mysqli_fetch_assoc($result) )
 		// {
 		// $name = $myrow['name'];
 		// $val = $myrow['val'];
@@ -5515,62 +5515,62 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		// Begin Grabbing phpbb config
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='server_name' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='server_name' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_server_name = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='server_port' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='server_port' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_server_port = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='script_path' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='script_path' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_script_path = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='sitename' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='sitename' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_sitename = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='site_desc' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='site_desc' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_site_desc = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='board_disable' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='board_disable' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_board_disable = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='require_activation' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='require_activation' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_require_activation = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='board_email_form' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='board_email_form' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_board_email_form = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='gzip_compress' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='gzip_compress' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_gzip_compress = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='prune_enable' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='prune_enable' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_prune_enable = $myrow['config_value'];
 
@@ -5578,32 +5578,32 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		// Begin cookie info
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='cookie_domain' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='cookie_domain' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_cookie_domain = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='cookie_name' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='cookie_name' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_cookie_name = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='cookie_path' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='cookie_path' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_cookie_path = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='cookie_secure' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='cookie_secure' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_cookie_secure = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='session_length' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='session_length' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_session_length = $myrow['config_value'];
 
@@ -5611,53 +5611,53 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		// Begin Email Info
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='board_email' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='board_email' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_board_email = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='board_email_sig' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='board_email_sig' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_board_email_sig = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='smtp_delivery' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='smtp_delivery' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_smtp_delivery = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='smtp_host' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='smtp_host' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_smtp_host = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='smtp_username' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='smtp_username' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_smtp_username = $myrow['config_value'];
 
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='smtp_password' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='smtp_password' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_smtp_password = $myrow['config_value'];
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='default_style' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='default_style' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_default_style = $myrow['config_value'];
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE  config_name='override_user_style' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE  config_name='override_user_style' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$config_override_user_style = $myrow['config_value'];
 
-		$result = mysql_query("SELECT * FROM $phpbb_config WHERE `config_name`='board_startdate' LIMIT 1");
-		$myrow = mysql_fetch_array($result);
+		$result = mysqli_query("SELECT * FROM $phpbb_config WHERE `config_name`='board_startdate' LIMIT 1");
+		$myrow = mysqli_fetch_array($result);
 
 		$board_startdate = $myrow['config_value'];
 
@@ -5992,9 +5992,9 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 					// Begin Style Listings
 
-					$themeresult = mysql_query("SELECT * FROM $phpbb_themes ORDER BY themes_id ASC");
+					$themeresult = mysqli_query("SELECT * FROM $phpbb_themes ORDER BY themes_id ASC");
 
-					while( $thememyrow = mysql_fetch_array($themeresult) )
+					while( $thememyrow = mysqli_fetch_array($themeresult) )
 
 					   {
 
@@ -6410,7 +6410,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 	
 	
 	
-			$result = mysql_query("SELECT * FROM $phpbb_users ORDER BY $list $order");
+			$result = mysqli_query("SELECT * FROM $phpbb_users ORDER BY $list $order");
 	
 			//
 			// Remove Resubmit message
@@ -6562,7 +6562,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 	
 			<?php
 	
-			while( $myrow = mysql_fetch_array($result) )
+			while( $myrow = mysqli_fetch_array($result) )
 	
 			   { //3.10
 	
@@ -6608,10 +6608,10 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 				   } //3.10.3-2
 		
 				$user_id = $myrow['user_id'];
-				$bantable = mysql_query("SELECT * FROM $phpbb_banlist WHERE ban_userid=$user_id");
+				$bantable = mysqli_query("SELECT * FROM $phpbb_banlist WHERE ban_userid=$user_id");
 	
 				$banstat = '-';
-				$banrow = mysql_fetch_array($bantable);
+				$banrow = mysqli_fetch_array($bantable);
 	
 				if( isset( $banrow['ban_userid'] ) )
 	
@@ -6730,7 +6730,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 			echo "</table></center>";
 
 	
-			$result = mysql_query("SELECT * FROM $phpbb_banlist ORDER BY ban_email ASC");
+			$result = mysqli_query("SELECT * FROM $phpbb_banlist ORDER BY ban_email ASC");
 	
 			?>
 	
@@ -6785,7 +6785,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 	
 			<?php
 	
-			while( $myrow = mysql_fetch_array($result) )
+			while( $myrow = mysqli_fetch_array($result) )
 	
 			   { // 3.10-1-1
 	
@@ -6894,8 +6894,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		
 					   }
 		
-					mysql_query("INSERT INTO $phpbb_banlist (ban_userid) VALUES ('$user_id')");
-					mysql_query("UPDATE $phpbb_sessions SET session_logged_in=0 WHERE session_user_id=$user_id");
+					mysqli_query("INSERT INTO $phpbb_banlist (ban_userid) VALUES ('$user_id')");
+					mysqli_query("UPDATE $phpbb_sessions SET session_logged_in=0 WHERE session_user_id=$user_id");
 					header( "Location: $index" );
 	
 		
@@ -6922,8 +6922,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		
 				   {
 	
-					$result = mysql_query("SELECT * FROM $phpbb_banlist WHERE ban_userid='$user_id'");
-					$myrow = mysql_fetch_array($result);
+					$result = mysqli_query("SELECT * FROM $phpbb_banlist WHERE ban_userid='$user_id'");
+					$myrow = mysqli_fetch_array($result);
 	
 					if( isset( $myrow['ban_userid'] ) )
 	
@@ -6931,7 +6931,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 	
 						// echo 'User found';
 	
-						mysql_query("DELETE FROM $phpbb_banlist WHERE ban_userid=$user_id");
+						mysqli_query("DELETE FROM $phpbb_banlist WHERE ban_userid=$user_id");
 						header( "Location: $index" );
 	
 					   }
@@ -6968,7 +6968,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		
 					   }
 	
-					mysql_query("UPDATE $phpbb_users SET user_active='1' WHERE user_id=$user_id");
+					mysqli_query("UPDATE $phpbb_users SET user_active='1' WHERE user_id=$user_id");
 					header( "Location: $index" );
 	
 		
@@ -6995,12 +6995,12 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		
 				   {
 		
-					$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
-					$myrow = mysql_fetch_array($result);
+					$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
+					$myrow = mysqli_fetch_array($result);
 	
-					$user_post_count_result = mysql_query("SELECT * FROM $phpbb_posts WHERE poster_id=$user_id");
-					$user_post_count = mysql_num_rows($user_post_count_result);
-					mysql_query("UPDATE $phpbb_users SET user_posts='$user_post_count' WHERE user_id=$user_id");
+					$user_post_count_result = mysqli_query("SELECT * FROM $phpbb_posts WHERE poster_id=$user_id");
+					$user_post_count = mysqli_num_rows($user_post_count_result);
+					mysqli_query("UPDATE $phpbb_users SET user_posts='$user_post_count' WHERE user_id=$user_id");
 	
 				   }
 	
@@ -7026,7 +7026,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 				   {
 	
 	
-					mysql_query("UPDATE $phpbb_users SET user_active='0' WHERE user_id=$user_id");
+					mysqli_query("UPDATE $phpbb_users SET user_active='0' WHERE user_id=$user_id");
 					header( "Location: $index" );
 	
 		
@@ -7054,8 +7054,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 				   {
 	
 	
-					mysql_query("UPDATE $phpbb_users SET user_active='0' WHERE user_id=$user_id");
-					mysql_query("UPDATE $phpbb_users SET user_actkey='' WHERE user_id=$user_id");
+					mysqli_query("UPDATE $phpbb_users SET user_active='0' WHERE user_id=$user_id");
+					mysqli_query("UPDATE $phpbb_users SET user_actkey='' WHERE user_id=$user_id");
 					header( "Location: $index" );
 	
 		
@@ -7083,7 +7083,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 				   {
 	
 	
-					mysql_query("UPDATE $phpbb_users SET user_sig='' WHERE user_id=$user_id");
+					mysqli_query("UPDATE $phpbb_users SET user_sig='' WHERE user_id=$user_id");
 					header( "Location: $index" );
 	
 		
@@ -7112,7 +7112,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 				   {
 	
 	
-					mysql_query("UPDATE $phpbb_users SET user_website='' WHERE user_id=$user_id");
+					mysqli_query("UPDATE $phpbb_users SET user_website='' WHERE user_id=$user_id");
 					header( "Location: $index" );
 	
 		
@@ -7151,8 +7151,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		
 				   {
 	
-					$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_id='$user_id'");
-					$myrow = mysql_fetch_array($result);
+					$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_id='$user_id'");
+					$myrow = mysqli_fetch_array($result);
 		
 					if( $user_id == -1 || $myrow['user_level'] == 2 )
 		
@@ -7162,7 +7162,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		
 					   }
 	
-					mysql_query("UPDATE $phpbb_users SET user_level='1' WHERE user_id=$user_id");
+					mysqli_query("UPDATE $phpbb_users SET user_level='1' WHERE user_id=$user_id");
 					header( "Location: $index" );
 	
 		
@@ -7190,8 +7190,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 		
 				   {
 	
-					$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_id='$user_id'");
-					$myrow = mysql_fetch_array($result);
+					$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_id='$user_id'");
+					$myrow = mysqli_fetch_array($result);
 		
 					if( $user_id == -1 || $myrow['user_level'] == 2 )
 		
@@ -7202,7 +7202,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 					   }
 	
 	
-					mysql_query("UPDATE $phpbb_users SET user_level='0' WHERE user_id=$user_id");
+					mysqli_query("UPDATE $phpbb_users SET user_level='0' WHERE user_id=$user_id");
 					header( "Location: $index" );
 	
 		
@@ -7338,11 +7338,11 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 					$sql = "UPDATE `$phpbb_users` SET `user_regdate`=$timestamp WHERE `user_id`=$user_id";
 	
 	
-					if( !$result = mysql_query( $sql ) )
+					if( !$result = mysqli_query( $sql ) )
 				
 					   {
 				
-							die( '<font size="4"><b>Error updating user\'s join date:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysql_error() );
+							die( '<font size="4"><b>Error updating user\'s join date:</b></font><br /><b>Line:</b> '.__LINE__.'<br /><b>File:</b> '.$_SERVER['PHP_SELF']."<br /><b>Query:</b> $sql<br /><b>MySQL Error:</b> ".mysqli_error() );
 				
 					   }
 
@@ -7400,9 +7400,9 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 				   {
 
-					$result = mysql_query("SELECT * FROM $phpbb_users ORDER BY user_email ASC");
+					$result = mysqli_query("SELECT * FROM $phpbb_users ORDER BY user_email ASC");
 
-					while($myrow = mysql_fetch_array($result))
+					while($myrow = mysqli_fetch_array($result))
 
 					   {
 
@@ -7442,8 +7442,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 			
 						   }
 	
-						$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
-						$myrow = mysql_fetch_array($result);
+						$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
+						$myrow = mysqli_fetch_array($result);
 	
 						echo $myrow['user_email']."\n";
 
@@ -7463,9 +7463,9 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 				   {
 
-					$result = mysql_query("SELECT * FROM $phpbb_users ORDER BY username ASC");
+					$result = mysqli_query("SELECT * FROM $phpbb_users ORDER BY username ASC");
 
-					while($myrow = mysql_fetch_array($result))
+					while($myrow = mysqli_fetch_array($result))
 
 					   {
 
@@ -7512,8 +7512,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 			
 						   }
 	
-						$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
-						$myrow = mysql_fetch_array($result);
+						$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
+						$myrow = mysqli_fetch_array($result);
 	
 						$username = $myrow['username'];
 	
@@ -7539,9 +7539,9 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 				   {
 
-					$result = mysql_query("SELECT * FROM $phpbb_users ORDER BY username ASC");
+					$result = mysqli_query("SELECT * FROM $phpbb_users ORDER BY username ASC");
 
-					while($myrow = mysql_fetch_array($result))
+					while($myrow = mysqli_fetch_array($result))
 
 					   {
 
@@ -7588,8 +7588,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 			
 						   }
 	
-						$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
-						$myrow = mysql_fetch_array($result);
+						$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
+						$myrow = mysqli_fetch_array($result);
 	
 						$username = $myrow['username'];
 	
@@ -7616,9 +7616,9 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 				   {
 
-					$result = mysql_query("SELECT * FROM $phpbb_users ORDER BY username ASC");
+					$result = mysqli_query("SELECT * FROM $phpbb_users ORDER BY username ASC");
 
-					while($myrow = mysql_fetch_array($result))
+					while($myrow = mysqli_fetch_array($result))
 
 					   {
 
@@ -7665,8 +7665,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 			
 						   }
 	
-						$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
-						$myrow = mysql_fetch_array($result);
+						$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
+						$myrow = mysqli_fetch_array($result);
 	
 						$username = $myrow['username'];
 	
@@ -7695,9 +7695,9 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 				   {
 
-					$result = mysql_query("SELECT * FROM $phpbb_users ORDER BY username ASC");
+					$result = mysqli_query("SELECT * FROM $phpbb_users ORDER BY username ASC");
 
-					while($myrow = mysql_fetch_array($result))
+					while($myrow = mysqli_fetch_array($result))
 
 					   {
 
@@ -7744,8 +7744,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 			
 						   }
 	
-						$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
-						$myrow = mysql_fetch_array($result);
+						$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
+						$myrow = mysqli_fetch_array($result);
 	
 						$username = $myrow['username'];
 	
@@ -7772,9 +7772,9 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 				   {
 
-					$result = mysql_query("SELECT * FROM $phpbb_users ORDER BY username ASC");
+					$result = mysqli_query("SELECT * FROM $phpbb_users ORDER BY username ASC");
 
-					while($myrow = mysql_fetch_array($result))
+					while($myrow = mysqli_fetch_array($result))
 
 					   {
 
@@ -7821,8 +7821,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 			
 						   }
 	
-						$result = mysql_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
-						$myrow = mysql_fetch_array($result);
+						$result = mysqli_query("SELECT * FROM $phpbb_users WHERE user_id=$user_id");
+						$myrow = mysqli_fetch_array($result);
 	
 						$username = $myrow['username'];
 	
@@ -8019,8 +8019,8 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 		   { //3.3--1
 
-			$row_result = mysql_query("SELECT * FROM $phpbb_users");
-			$row_count = mysql_num_rows($row_result);
+			$row_result = mysqli_query("SELECT * FROM $phpbb_users");
+			$row_count = mysqli_num_rows($row_result);
 
 			if( $_SESSION['show_ban'] == true )
 
@@ -8191,24 +8191,24 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 	//
 	****************************************************************************************/
 
-	//	$result = mysql_query("SELECT * FROM $phpbb_users$db_show$search_query ORDER BY $db_list $db_order LIMIT $start$limit");
-		$result = mysql_query("SELECT * FROM $phpbb_users$db_show$search_query ORDER BY $db_list $db_order LIMIT $start$limit");
-		$current_result = mysql_query("SELECT * FROM $phpbb_users$db_show$search_query ORDER BY $db_list $db_order");
+	//	$result = mysqli_query("SELECT * FROM $phpbb_users$db_show$search_query ORDER BY $db_list $db_order LIMIT $start$limit");
+		$result = mysqli_query("SELECT * FROM $phpbb_users$db_show$search_query ORDER BY $db_list $db_order LIMIT $start$limit");
+		$current_result = mysqli_query("SELECT * FROM $phpbb_users$db_show$search_query ORDER BY $db_list $db_order");
 
-		$row_result = mysql_query("SELECT * FROM $phpbb_users");
-		$total_row_result = mysql_query("SELECT * FROM $phpbb_users");
+		$row_result = mysqli_query("SELECT * FROM $phpbb_users");
+		$total_row_result = mysqli_query("SELECT * FROM $phpbb_users");
 
-		$listed_row_count = mysql_num_rows($result);
-		$current_row_count = mysql_num_rows($total_row_result);
-		$total_row_count = mysql_num_rows($total_row_result);
+		$listed_row_count = mysqli_num_rows($result);
+		$current_row_count = mysqli_num_rows($total_row_result);
+		$total_row_count = mysqli_num_rows($total_row_result);
 
-//		echo "$result = mysql_query(\"SELECT * FROM $phpbb_users$db_show$search_query ORDER BY $db_list $db_order LIMIT $start$limit\");";
+//		echo "$result = mysqli_query(\"SELECT * FROM $phpbb_users$db_show$search_query ORDER BY $db_list $db_order LIMIT $start$limit\");";
 
 		if( $_SESSION['show'] == 'admin' || $_SESSION['show'] == 'hidden' || $_SESSION['show'] == 'inactive' || $_SESSION['show'] == 'mod' || $_SESSION['search'] != '' )
 
 		   {
 
-			$row_count = mysql_num_rows($current_result);
+			$row_count = mysqli_num_rows($current_result);
 
 		   }
 
@@ -8216,7 +8216,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 		   {
 
-			$row_count = mysql_num_rows($row_result);
+			$row_count = mysqli_num_rows($row_result);
 
 		   }
 
@@ -8262,7 +8262,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 		   {
 
-			$row_count = mysql_num_rows($current_result);
+			$row_count = mysqli_num_rows($current_result);
 
 		   }
 
@@ -8270,7 +8270,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 		   {
 
-			$row_count = mysql_num_rows($row_result);
+			$row_count = mysqli_num_rows($row_result);
 
 		   }
 
@@ -8818,7 +8818,7 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 
 		   { //3.9-1
 
-			while( $myrow = mysql_fetch_array($result) )
+			while( $myrow = mysqli_fetch_array($result) )
 
 			   { //3.10
 
@@ -8864,10 +8864,10 @@ elseif( $_SESSION['user_level'] == 'admin' || $_SESSION['user_level'] == 'mod' &
 				   } //3.10.3-2
 		
 				$user_id = $myrow['user_id'];
-				$bantable = mysql_query("SELECT * FROM $phpbb_banlist WHERE ban_userid=$user_id");
+				$bantable = mysqli_query("SELECT * FROM $phpbb_banlist WHERE ban_userid=$user_id");
 
 				$banstat = '-';
-				$banrow = mysql_fetch_array($bantable);
+				$banrow = mysqli_fetch_array($bantable);
 
 				if( isset( $banrow['ban_userid'] ) )
 

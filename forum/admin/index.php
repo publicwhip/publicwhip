@@ -228,11 +228,11 @@ elseif( isset($HTTP_GET_VARS['pane']) && $HTTP_GET_VARS['pane'] == 'right' )
 	//
 	if( preg_match("/^mysql/", SQL_LAYER) )
 	{
-		$sql = "SELECT VERSION() AS mysql_version";
+		$sql = "SELECT VERSION() AS mysqli_version";
 		if($result = $db->sql_query($sql))
 		{
 			$row = $db->sql_fetchrow($result);
-			$version = $row['mysql_version'];
+			$version = $row['mysqli_version'];
 
 			if( preg_match("/^(3\.23|4\.|5\.)/", $version) )
 			{
