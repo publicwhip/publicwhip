@@ -45,18 +45,18 @@ class sql_db
 		$this->server = $sqlserver;
 		$this->dbname = $database;
 
-		$this->db_connect_id = ($this->persistency) ? mysql_pconnect($this->server, $this->user, $this->password) : mysql_connect($this->server, $this->user, $this->password);
+		$this->db_connect_id = ($this->persistency) ? mysqli_pconnect($this->server, $this->user, $this->password) : mysqli_connect($this->server, $this->user, $this->password);
 
 		if( $this->db_connect_id )
 		{
 			if( $database != "" )
 			{
 				$this->dbname = $database;
-				$dbselect = mysql_select_db($this->dbname);
+				$dbselect = mysqli_select_db($this->dbname);
 
 				if( !$dbselect )
 				{
-					mysql_close($this->db_connect_id);
+					mysqli_close($this->db_connect_id);
 					$this->db_connect_id = $dbselect;
 				}
 			}
@@ -81,10 +81,10 @@ class sql_db
 			//
 			if( $this->in_transaction )
 			{
-				mysql_query("COMMIT", $this->db_connect_id);
+				mysqli_query("COMMIT", $this->db_connect_id);
 			}
 
-			return mysql_close($this->db_connect_id);
+			return mysqli_close($this->db_connect_id);
 		}
 		else
 		{
@@ -107,7 +107,7 @@ class sql_db
 			$this->num_queries++;
 			if( $transaction == BEGIN_TRANSACTION && !$this->in_transaction )
 			{
-				$result = mysql_query("BEGIN", $this->db_connect_id);
+				$result = mysqli_query("BEGIN", $this->db_connect_id);
 				if(!$result)
 				{
 					return false;
@@ -115,13 +115,13 @@ class sql_db
 				$this->in_transaction = TRUE;
 			}
 
-			$this->query_result = mysql_query($query, $this->db_connect_id);
+			$this->query_result = mysqli_query($query, $this->db_connect_id);
 		}
 		else
 		{
 			if( $transaction == END_TRANSACTION && $this->in_transaction )
 			{
-				$result = mysql_query("COMMIT", $this->db_connect_id);
+				$result = mysqli_query("COMMIT", $this->db_connect_id);
 			}
 		}
 
@@ -134,9 +134,9 @@ class sql_db
 			{
 				$this->in_transaction = FALSE;
 
-				if ( !mysql_query("COMMIT", $this->db_connect_id) )
+				if ( !mysqli_query("COMMIT", $this->db_connect_id) )
 				{
-					mysql_query("ROLLBACK", $this->db_connect_id);
+					mysqli_query("ROLLBACK", $this->db_connect_id);
 					return false;
 				}
 			}
@@ -147,7 +147,7 @@ class sql_db
 		{
 			if( $this->in_transaction )
 			{
-				mysql_query("ROLLBACK", $this->db_connect_id);
+				mysqli_query("ROLLBACK", $this->db_connect_id);
 				$this->in_transaction = FALSE;
 			}
 			return false;
@@ -164,12 +164,12 @@ class sql_db
 			$query_id = $this->query_result;
 		}
 
-		return ( $query_id ) ? mysql_num_rows($query_id) : false;
+		return ( $query_id ) ? mysqli_num_rows($query_id) : false;
 	}
 
 	function sql_affectedrows()
 	{
-		return ( $this->db_connect_id ) ? mysql_affected_rows($this->db_connect_id) : false;
+		return ( $this->db_connect_id ) ? mysqli_affected_rows($this->db_connect_id) : false;
 	}
 
 	function sql_numfields($query_id = 0)
@@ -179,7 +179,7 @@ class sql_db
 			$query_id = $this->query_result;
 		}
 
-		return ( $query_id ) ? mysql_num_fields($query_id) : false;
+		return ( $query_id ) ? mysqli_num_fields($query_id) : false;
 	}
 
 	function sql_fieldname($offset, $query_id = 0)
@@ -189,7 +189,7 @@ class sql_db
 			$query_id = $this->query_result;
 		}
 
-		return ( $query_id ) ? mysql_field_name($query_id, $offset) : false;
+		return ( $query_id ) ? mysqli_field_name($query_id, $offset) : false;
 	}
 
 	function sql_fieldtype($offset, $query_id = 0)
@@ -199,7 +199,7 @@ class sql_db
 			$query_id = $this->query_result;
 		}
 
-		return ( $query_id ) ? mysql_field_type($query_id, $offset) : false;
+		return ( $query_id ) ? mysqli_field_type($query_id, $offset) : false;
 	}
 
 	function sql_fetchrow($query_id = 0)
@@ -211,7 +211,7 @@ class sql_db
 
 		if( $query_id )
 		{
-			$this->row[$query_id] = mysql_fetch_array($query_id, MYSQL_ASSOC);
+			$this->row[$query_id] = mysqli_fetch_array($query_id, mysqli_ASSOC);
 			return $this->row[$query_id];
 		}
 		else
@@ -232,7 +232,7 @@ class sql_db
 			unset($this->rowset[$query_id]);
 			unset($this->row[$query_id]);
 
-			while($this->rowset[$query_id] = mysql_fetch_array($query_id, MYSQL_ASSOC))
+			while($this->rowset[$query_id] = mysqli_fetch_array($query_id, mysqli_ASSOC))
 			{
 				$result[] = $this->rowset[$query_id];
 			}
@@ -256,7 +256,7 @@ class sql_db
 		{
 			if( $rownum > -1 )
 			{
-				$result = mysql_result($query_id, $rownum, $field);
+				$result = mysqli_result($query_id, $rownum, $field);
 			}
 			else
 			{
@@ -295,12 +295,12 @@ class sql_db
 			$query_id = $this->query_result;
 		}
 
-		return ( $query_id ) ? mysql_data_seek($query_id, $rownum) : false;
+		return ( $query_id ) ? mysqli_data_seek($query_id, $rownum) : false;
 	}
 
 	function sql_nextid()
 	{
-		return ( $this->db_connect_id ) ? mysql_insert_id($this->db_connect_id) : false;
+		return ( $this->db_connect_id ) ? mysqli_insert_id($this->db_connect_id) : false;
 	}
 
 	function sql_freeresult($query_id = 0)
@@ -315,7 +315,7 @@ class sql_db
 			unset($this->row[$query_id]);
 			unset($this->rowset[$query_id]);
 
-			mysql_free_result($query_id);
+			mysqli_free_result($query_id);
 
 			return true;
 		}
@@ -327,8 +327,8 @@ class sql_db
 
 	function sql_error()
 	{
-		$result['message'] = mysql_error($this->db_connect_id);
-		$result['code'] = mysql_errno($this->db_connect_id);
+		$result['message'] = mysqli_error($this->db_connect_id);
+		$result['code'] = mysqli_errno($this->db_connect_id);
 
 		return $result;
 	}

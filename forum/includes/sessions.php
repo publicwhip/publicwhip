@@ -335,7 +335,7 @@ function session_pagestart($user_ip, $thispage_id)
 	global $user_name;
 	// Look it up in PHPBB user account list
 	$result = $db->sql_query("select user_id from phpbb_users where username = '"
-		. mysql_escape_string($user_name) . "'");
+		. mysqli_escape_string($user_name) . "'");
 	if ($result) {
 		$row = $db->sql_fetchrow($result);
 		$user_id_for_phpbb = $row['user_id'];
@@ -371,7 +371,7 @@ function session_pagestart($user_ip, $thispage_id)
 			$user_id = $row['total'] + 1;
 			$notifyreply = 1;
 			$sql = "INSERT INTO " . USERS_TABLE . "	 
-VALUES ('" . mysql_escape_string($user_id) . "',1,'" . mysql_escape_string($user_name) . "','NEVER***',0,0,0," . time() . ",0,0,0.00,1,'english','D M d, Y g:i a',0,0,0,NULL,0,1,1,1,1,1,1,1,1,1,1,0,'',0,'" . mysql_escape_string(user_getemail()). "','','','','','','','','','','','',NULL,0,0)";
+VALUES ('" . mysqli_escape_string($user_id) . "',1,'" . mysqli_escape_string($user_name) . "','NEVER***',0,0,0," . time() . ",0,0,0.00,1,'english','D M d, Y g:i a',0,0,0,NULL,0,1,1,1,1,1,1,1,1,1,1,0,'',0,'" . mysqli_escape_string(user_getemail()). "','','','','','','','','','','','',NULL,0,0)";
 
 /*				VALUES ($user_id, '" . str_replace("\'", "''", $user_name) . "', " . time() . ", '" . str_replace("\'", "''", "NOT VALID ***") . "', '" . str_replace("\'", "''", user_getemail()) . "', '" . str_replace("\'", "''", $icq) . "', '" . str_replace("\'", "''", $website) . "', '" . str_replace("\'", "''", $occupation) . "', '" . str_replace("\'", "''", $location) . "', '" . str_replace("\'", "''", $interests) . "', '" . str_replace("\'", "''", $signature) . "', '$signature_bbcode_uid', $avatar_sql, $viewemail, '" . str_replace("\'", "''", str_replace(' ', '+', $aim)) . "', '" . str_replace("\'", "''", $yim) . "', '" . str_replace("\'", "''", $msn) . "', $attachsig, $allowsmilies, $allowhtml, $allowbbcode, $allowviewonline, $notifyreply, $notifypm, $popup_pm, $user_timezone, '" . str_replace("\'", "''", $user_dateformat) . "', '" . str_replace("\'", "''", $user_lang) . "', $user_style, 0, 1, ";
 */
