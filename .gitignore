@@ -1,6 +1,7 @@
 .DS_Store
 loader/PublicWhip/Config.pm
 website/.htaccess
+website/.well-known
 website/config.php
 website/google*
 website/data/votematrix*
