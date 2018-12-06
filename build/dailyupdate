@@ -102,5 +102,6 @@ echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: All divisions"
 cd ~/www.publicwhip.org.uk/build
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: popolo division data"
 ./generate_popolo_json.php
+./recently_changed_popolo_json.php
 
 echo "[$(date +\%Y-\%m-\%d\ %H:%M:%S)] dailyupdate: Complete"
