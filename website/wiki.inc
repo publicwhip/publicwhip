@@ -77,19 +77,16 @@ function get_wiki_current_value($type, $params)
         $result = $allRows[0];
     }
 
-    if ($type == 'motion') {
-        list($motion, $division_name) = get_motion_default_values($db, $params);
-        if (!$result) {
-            $result = array(
-                'text_body' => $motion,
-                'edit_date' => $params[0],
-                'user_id' => 0
-            );
-        }
-        $result['text_body'] = add_motion_missing_wrappers($result['text_body'], $division_name);
-    } else {
-        trigger_error("Unknown wiki type '" . html_scrub($type). "'", E_USER_ERROR);
+    list($motion, $division_name) = get_motion_default_values($db, $params);
+    if (!$result) {
+        $result = array(
+            'text_body' => $motion,
+            'edit_date' => $params[0],
+            'user_id' => 0
+        );
     }
+    $result['text_body'] = add_motion_missing_wrappers($result['text_body'], $division_name);
+    
     return $result;
 }
 
@@ -173,7 +170,7 @@ function extract_motion_text_from_wiki_text($text)
         $motion = implode("\n", $res);
     #$motion = preg_replace("/\*/", "HIHI", $motion);
     }
-    $motion = guy2html(guy_strip_bad($motion));
+    $motion = guy2html(guy_strip_bad(trim($motion)));
 
     return $motion;
 }
@@ -187,14 +184,14 @@ function extract_motion_text_from_wiki_text_for_edit($text)
 	$motion = preg_replace("/<p\b.*?class=\"italic\".*?>(.*)<\/p>/",'<p><i>\\1</i></p>',$motion);
 	$motion = preg_replace("/<p\b.*?class=\"indent\".*?>(.*)<\/p>/",'<blockquote>\\1</blockquote>',$motion);
 
-    return $motion;
+    return trim($motion);
 }
 
 
 # Call this to get title from wiki text for display
 function extract_title_from_wiki_text($text)
 {
-    if (preg_match("/--- DIVISION TITLE ---(.*)--- MOTION EFFECT/s", $text, $matches)) {
+    if (preg_match("/--- DIVISION TITLE ---\s*(.*)\s*--- MOTION EFFECT/s", $text, $matches)) {
         $title = $matches[1];
     }
     $title = trim(strip_tags($title));
@@ -244,5 +241,3 @@ function update_divisions_wiki_id($db)
         GROUP BY pw_division.division_id
     ",array());
 }
-
-?>
