@@ -324,7 +324,7 @@ function get_mpid_attr_decode($db, $db2, $i, $voter2dream_overlap = null, $pc_pa
 function get_dreammpid_attr_decode($db, $i)
 {
     global $pwpdo;
-    $dreammpid = db_scrub($_GET[($i == "id" ? $i : "dmp$i")]);  # so we can choose to look for id= instead of dmp=
+    $dreammpid = db_scrub($_GET[($i == "id" ? $i : "dmp$i")] ?? '');  # so we can choose to look for id= instead of dmp=
     if ($dreammpid == "" && $i == "id") {
         $dreammpid = db_scrub($_POST[$i]);
     }
@@ -392,7 +392,7 @@ function get_division_attr_decode($i = '')
         return "none";
     }
 
-    $house_paramter = "";
+    $house_parameter = "";
     if ($row['house'] == "lords") {
         $house_parameter = "&house=lords";
     } elseif ($row['house'] == "scotland") {
