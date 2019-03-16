@@ -392,7 +392,7 @@ function get_division_attr_decode($i = '')
         return "none";
     }
 
-    $house_paramter = "";
+    $house_parameter = "";
     if ($row['house'] == "lords") {
         $house_parameter = "&house=lords";
     } elseif ($row['house'] == "scotland") {
