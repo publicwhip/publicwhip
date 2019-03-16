@@ -120,7 +120,7 @@ function extract_motion_text_from_wiki_text($text)
         {
             $ml = preg_replace("/''(.*?)''/", "<em>\\1</em>", $motionline);
             $ml = preg_replace("/\[(https?:\S*)\s+(.*?)\]/", "<a href=\"\\1\">\\2</a>", $ml);
-            $ml = preg_replace("/(?<![*\s])(\[(\d+)\])/", "<sup class=\"sup-\\2\"><a class=\"sup\" href='#footnote-\\2' onclick=\"ClickSup(\\2); return false;\">\\1</a></sup>", $ml);
+            $ml = preg_replace("/(?<![*\s])(\[(\d+)\])/", "<sup class=\"sup-\\2\"><a class=\"sup\" href=\"#footnote-\\2\" onclick=\"ClickSup(\\2); return false;\">\\1</a></sup>", $ml);
             #$ml = preg_replace("/(\[\d+])/", "<sup>\\1</sup>", $ml);
             if (preg_match("/^\s\s*$/", $ml))
                 continue;
