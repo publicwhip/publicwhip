@@ -82,7 +82,7 @@ sub do_one_file {
         #$mp_name{$data[0]} = $data[0] . " " . $data[1] . " " . $data[2] . " (" . $data[3] . ")";
 
         $mp_name{$data[0]} = "mpid$data[0]"; #-$data[3]"; # commented out to stay =<8 chars
-        print METADATA $data[0] . "\t" . $data[1] . "\t" . $data[2] . "\t" . $data[3] .  "\thttp://publicwhip.com/mp.php?mpid=$data[0]\n";
+        print METADATA $data[0] . "\t" . $data[1] . "\t" . $data[2] . "\t" . $data[3] .  "\thttps://www.publicwhip.org.uk/mp.php?mpid=$data[0]\n";
     }
 
     my @div_ixs;
