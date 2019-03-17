@@ -50,7 +50,7 @@ sub do_one_file {
     open(OUT , "> $path/$outfile.dat") || die "can't open $outfile.dat in $path:$!";
     open(METADATA, "> $path/$outfile.txt") || die "can't open $outfile.txt:$!";
     print METADATA "file: $outfile.csv covering $parl_name\n";
-    print METADATA "file created: " . scalar localtime() . "by http://www.publicwhip.org.uk/\n";
+    print METADATA "file created: " . scalar localtime() . "by https://www.publicwhip.org.uk/\n";
     # Get ids of MPs
     my $limit = "";
     printf "* %s: %s\n","votematrix","Processing $outfile";
@@ -82,7 +82,7 @@ sub do_one_file {
         #$mp_name{$data[0]} = $data[0] . " " . $data[1] . " " . $data[2] . " (" . $data[3] . ")";
 
         $mp_name{$data[0]} = "mpid$data[0]"; #-$data[3]"; # commented out to stay =<8 chars
-        print METADATA $data[0] . "\t" . $data[1] . "\t" . $data[2] . "\t" . $data[3] .  "\thttp://publicwhip.com/mp.php?mpid=$data[0]\n";
+        print METADATA $data[0] . "\t" . $data[1] . "\t" . $data[2] . "\t" . $data[3] .  "\thttps://www.publicwhip.org.uk/mp.php?mpid=$data[0]\n";
     }
 
     my @div_ixs;
