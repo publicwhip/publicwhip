@@ -10,7 +10,7 @@ function get_motions() {
     global $pwpdo;
     $pw_motions = array();
 
-    $date = date('Y-m-d', time() - 86400 * 28);
+    $date = date('Y-m-d', time() - 86400 * 62);
     $query = 'SELECT text_body, division_date, division_number, house, division_name, division_id, source_url, source_gid
     FROM pw_dyn_wiki_motion pw
         JOIN pw_division USING (division_date,division_number,house)
