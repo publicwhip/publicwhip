@@ -642,7 +642,7 @@ class Diff
      *          (Typically these are lines from a file.)
      * @param $to_lines array An array of strings.
      */
-    function Diff($from_lines, $to_lines)
+    function __construct($from_lines, $to_lines)
     {
         $eng = new _DiffEngine;
         $this->edits = $eng->diff($from_lines, $to_lines);
