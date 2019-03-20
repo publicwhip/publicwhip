@@ -8,4 +8,5 @@ website/data/votematrix*
 website/data/*.bz2
 website/feeds/interestingdivisions.xml
 website/data/popolo/*.json
+website/feeds/alldivisions.xml
 postcodecache/*.json
