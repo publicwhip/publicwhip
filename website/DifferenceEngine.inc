@@ -9,7 +9,8 @@
  * @copyright (C) 2000, 2001 Geoffrey T. Dairiki <dairiki@dairiki.org>
  * @license  You may copy this code freely under the conditions of the GPL.
  */
-define('USE_ASSERTS', function_exists('assert'));
+//define('USE_ASSERTS', function_exists('assert'));
+define('USE_ASSERTS',false);
 
 /**
  * Class _DiffOp
@@ -642,11 +643,16 @@ class Diff
      *          (Typically these are lines from a file.)
      * @param $to_lines array An array of strings.
      */
-    function Diff($from_lines, $to_lines)
+    function __construct($from_lines, $to_lines)
     {
         $eng = new _DiffEngine;
         $this->edits = $eng->diff($from_lines, $to_lines);
         //$this->_check($from_lines, $to_lines);
+    }
+
+    static function handleDiff($from_lines, $to_lines) {
+        $diff=new self($from_lines,$to_lines);
+        return $diff->edits;
     }
 
     /**
@@ -817,7 +823,7 @@ class MappedDiff
         assert(count($from_lines) === count($mapped_from_lines));
         assert(count($to_lines) === count($mapped_to_lines));
 
-        $this->Diff($mapped_from_lines, $mapped_to_lines);
+        $this->edits=Diff::handleDiff($mapped_from_lines, $mapped_to_lines);
 
         $xi = $yi = 0;
         $count=count($this->edits);
