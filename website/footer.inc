@@ -15,8 +15,8 @@
             <p>The Public Whip is a not-for-profit, open source website created in 2003 by Francis Irving and Julian
                 Todd and now run by <a href="https://www.bairwell.com">Bairwell Ltd</a>.</p>
 
-            <p>TWe're working on updating the site, but if you'd like to talk to us about the project, please email
-                team@publicwhip.org.uk </p></div>
+            <p>PublicWhip <a href="https://github.com/publicwhip/publicwhipv2">v2 codebase</a> is currently under development - you can join the <a href="https://join.slack.com/t/publicwhip/shared_invite/enQtNTczMTg1MTc1Mzc3LTAxMjkyYzNhNWY0NDdmY2EzYjYwNTZjNjQ1YTNiOTQwZWYzM2Q0ZDJjOWU5MTVjNzZmNGFjMzljY2U0ZjA0YjM">Slack group</a> to find out more or email
+                team@publicwhip.org.uk</p></div>
         <div class="col3"><h3>The Whip on the Web</h3>
             <ul class="social">
                 <li class="tw"><a href="https://twitter.com/publicwhip">Twitter</a></li>
