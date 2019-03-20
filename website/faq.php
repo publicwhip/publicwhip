@@ -396,24 +396,24 @@ would retain all the power but would have slightly better software
 
 <h2 class="faq"><a name="organisation">What organisation is behind the Public Whip?</a></h2>
 <p>It was started by just two guys <a href="http://www.flourish.org">Francis</a> and <a
-href="http://www.goatchurch.org.uk">Julian</a> who had an idea and made it happen. In August 2011 it was handed over to <a href="http://www.bairwell.com/">Beebware Ltd</a> to further develop and expand the project. The site will remain true to its open source roots.</p>
+href="http://www.goatchurch.org.uk">Julian</a> who had an idea and made it happen. In August 2011 it was handed over to <a href="https://www.bairwell.com/">Bairwell Ltd</a> to further develop and expand the project. The site will remain true to its open source roots.</p>
 
 
 <h2 class="faq"><a name="theyworkforyou">What's your connection with TheyWorkForYou.com?</a></h2>
 
-<p>Both of Public Whip's founders, Francis and Julian, are members of that project, but Bairwell and Public Whip are not. Both projects currently use code and data in the separate <a href="http://ukparse.kforge.net/parlparse">Parliament
+<p>Both of Public Whip's founders, Francis and Julian, are members of that project, but Bairwell and Public Whip are not. Both projects currently use code and data in the separate <a href="https://parser.theyworkforyou.com/">Parliament
 Parser</a> project.</p>
 
 
 
 <h2 class="faq"><a name="interviews">Are you happy to give interviews about Public Whip?</a></h2>
 
-<p>Yes, though at the time of writing (September 2011) we are still getting to grips with the project. Email team@publicwhip.org.uk for press enquiries (we're always happy to hear from bloggers as well as major news organisations).</p>
+<p>Yes, email team@publicwhip.org.uk for press enquiries (we're always happy to hear from bloggers as well as major news organisations).</p>
 
 
 <h2 class="faq"><a name="money">Do you make any money out of Public Whip?</a></h2>
 
-<p>Public Whip is run on a not-for-profit basis. We are preparing to offer a limited number of sponsorship and advertising packages to carefully selected organisations, the income from which will contribute to the redevelopment and expansion of the project. If you are interested in sponsoring, or advertising with, Public Whip please contact us via team@publicwhip.org.uk .</p>
+<p>Public Whip is run on a not-for-profit basis: we do have a couple of small affiliated links on the website to help cover the costs, but if you are interested in sponsorship, please email team@publicwhip.org.uk .</p>
 
 <h2 class="faq"><a name="living">How do you earn enough to make a living?</a></h2>
 
@@ -525,13 +525,13 @@ they voted quiz</a>.  You can still take it and link to the results.
 
 
 <h2 class="faq"><a name="keepup">How can I keep up with what you are doing?</a></h2>
-<p>There's the <a href="http://blog.publicwhip.org.uk/">blog</a> and our <a href="http://www.facebook.com/pages/Public-Whip/199268083464697">Facebook page</a>, or you can ask us questions and get updates via and our <a href="http://twitter.com/publicwhip">Twitter account</a>.</p>
+<p>There's the <a href="https://join.slack.com/t/publicwhip/shared_invite/enQtNTczMTg1MTc1Mzc3LTAxMjkyYzNhNWY0NDdmY2EzYjYwNTZjNjQ1YTNiOTQwZWYzM2Q0ZDJjOWU5MTVjNzZmNGFjMzljY2U0ZjA0YjM">Slack group</a> and our <a href="http://www.facebook.com/pages/Public-Whip/199268083464697">Facebook page</a>, or you can ask us questions and get updates via and our <a href="http://twitter.com/publicwhip">Twitter account</a>.</p>
 
 
 <h2 class="faq"><a name="contact">There's something wrong with your webpage / I've found an error / Your wording is dreadfully unclear / Can I make a suggestion?</a></h2>
 
-<p>You can contact us via email at team@publicwhip.org.uk, our <a href="http://www.facebook.com/pages/Public-Whip/199268083464697">Facebook page</a> and our <a href="http://twitter.com/publicwhip">Twitter account</a>. We are currently investigating the best option for error reporting, so please use one of the above methods in the meantime.</p>
+<p>You can contact us via email at team@publicwhip.org.uk, our <a href="https://join.slack.com/t/publicwhip/shared_invite/enQtNTczMTg1MTc1Mzc3LTAxMjkyYzNhNWY0NDdmY2EzYjYwNTZjNjQ1YTNiOTQwZWYzM2Q0ZDJjOWU5MTVjNzZmNGFjMzljY2U0ZjA0YjM">Slack group</a> our <a href="http://www.facebook.com/pages/Public-Whip/199268083464697">Facebook page</a> and our <a href="http://twitter.com/publicwhip">Twitter account</a>. We are currently investigating the best option for error reporting, so please use one of the above methods in the meantime.</p>
 
-<?php pw_footer() ?>
+<?php pw_footer();
 
 
