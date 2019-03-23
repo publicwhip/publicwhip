@@ -24,7 +24,20 @@ function add_motion_missing_wrappers($text_body, $division_name) {
         $text_body = 
             "--- DIVISION TITLE ---\n\n" . $division_name . "\n\n" . $text_body;
     }
+	
     $text_body = preg_replace("/&#8212;/", "-", $text_body);
+	    // fix broken p tags
+    $text_body = preg_replace('/\<p\s+(\n|\r)/','<p>',$text_body);
+    $text_body = preg_replace('/\<p\s+([^\>]+)\</', '<p>\1', $text_body);
+    // fix broken href tags
+    $text_body = preg_replace('/href="([^\"\>]+)\>/','href="\1">',$text_body);
+    $text_body = str_replace(['<a href="href="','<a href="<a href="'],'<a href="',$text_body);
+    $text_body = str_replace(['<a href="href="', '<a href="<a href="'], '<a href="', $text_body);
+    $text_body = preg_replace('/href="([^\"]+)\"\s+([A-Za-z]+\s+)/','href="\1">\2',$text_body);
+    $text_body = preg_replace('/\<p\s+Link:\s+(http[^\< ]+)\s+\<\/p\>/','<p><a href="\1">Link</a></p>',$text_body);
+    // fix broken class tags
+    $text_body = preg_replace('/p class="([A-Za-z0-9\.]+)\>/','p class="\1">',$text_body);
+	
     return $text_body;
 }
 
