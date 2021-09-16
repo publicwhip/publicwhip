@@ -25,6 +25,18 @@ function add_motion_missing_wrappers($text_body, $division_name) {
             "--- DIVISION TITLE ---\n\n" . $division_name . "\n\n" . $text_body;
     }
     $text_body = preg_replace("/&#8212;/", "-", $text_body);
+
+    // fix broken p tags
+    $text_body = preg_replace('/\<p\s+([\n|\r|\s]+)/','<p>',$text_body);
+    $text_body = preg_replace('/\<p\s+([^\>]+)\</', '<p>\1', $text_body);
+    // fix broken href tags
+    $text_body = preg_replace('/href="([^\"\>]+)\>/','href="\1">',$text_body);
+    $text_body = str_replace(['<a href="href="','<a href="<a href="'],'<a href="',$text_body);
+    $text_body = preg_replace('/href="([^\"]+)\"\s+([A-Za-z]+\s+)/','href="\1">\2',$text_body);
+    $text_body = preg_replace('/\<p\s+Link:\s+(http[^\< ]+)\s+\<\/p\>/','<p><a href="\1">Link</a></p>',$text_body);
+    // fix broken class tags
+    $text_body = preg_replace('/p class="([A-Za-z0-9\.]+)\>/','p class="\1">',$text_body);
+
     return $text_body;
 }
 
@@ -86,7 +98,7 @@ function get_wiki_current_value($type, $params)
         );
     }
     $result['text_body'] = add_motion_missing_wrappers($result['text_body'], $division_name);
-    
+
     return $result;
 }
 
@@ -110,10 +122,12 @@ function extract_action_text_from_wiki_text($text)
 function extract_motion_text_from_wiki_text($text)
 {
     $motion = extract_motion_text_from_wiki_text_for_edit($text);
+
     if (!preg_match("/.*<\/.*?>/", $motion))
     {
         $motionlines = explode("\n", $motion);
         $binUL = 0;
+        $previousUl = null;
         $res = array();
         $matches = array();
         foreach ($motionlines as $motionline)
@@ -128,15 +142,13 @@ function extract_motion_text_from_wiki_text($text)
                 continue;
             if (preg_match("/^(\*|:)/", $ml))
             {
-                if (!$binUL)
-                    $res[] = "<ul>";
                 $binUL = (preg_match("/^\*\*/", $ml) ? 2 : 1);
                 if (preg_match("/^:/", $ml))
                     $binUL = 3;
-                else if (preg_match("/^\s*\*\s*\[\d+\]/", $ml, $matches))
+                else if (preg_match("/^\s*\*\s*\[(\d+)\]/", $ml, $matches))
                 {
-                    $binUL = 4; 
-                    $footnum = preg_replace("/[\s\*\[\]]+/", "", $matches[0]);  // awful stuff because I can't pull out bits like in python
+                    $binUL = 4;
+                    $footnum = (int)$matches[1];
                 }
                 $ml = preg_replace("/^(\*\*|\*|:)\s*/", "", $ml);
             }
@@ -145,7 +157,15 @@ function extract_motion_text_from_wiki_text($text)
                 $binUL = 0;
                 $res[] = "</ul>";
             }
-
+            if ($previousUl !== $binUL) {
+                if (null !== $previousUl && 0 !== $previousUl) {
+                    $res[] = '</ul>';
+                }
+                if ($binUL > 0) {
+                    $res[] = '<ul>';
+                }
+                $previousUl = $binUL;
+            }
             
             if ($binUL == 0)
                 $res[] = "<p>";
