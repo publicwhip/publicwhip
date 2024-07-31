@@ -46,15 +46,8 @@ debug("Deleting tables");
 $sth = PublicWhip::DB::query($dbh, "delete from pw_moffice");
 $sth = PublicWhip::DB::query($dbh, "delete from pw_constituency");
 
-my %membertoperson;
-debug("Parsing constituencies.json");
-loadcons('commons', $members_location. '/constituencies.json');
-
-debug("Parsing sp-constituencies.json");
-loadcons('scotland', $members_location. '/sp-constituencies.json');
-
 debug("Parsing people.json");
-loadpeople();
+loadpeopleandconstituencies();
 
 debug("Parsing ministers.xml");
 loadmoffice();
@@ -65,7 +58,7 @@ foreach my $gid (keys %$gid_to_internal) {
     $sth = PublicWhip::DB::query($dbh, "delete from pw_mp where gid = '$gid'");
 }
 
-sub loadpeople
+sub loadpeopleandconstituencies
 {
     my $j = decode_json(read_file($members_location. '/people.json'));
     foreach (@{$j->{persons}}) {
@@ -76,6 +69,7 @@ sub loadpeople
     }
     foreach (@{$j->{posts}}) {
         $posts{$_->{id}} = $_;
+        loadcon($_);
     }
     foreach (@{$j->{memberships}}) {
         loadmember($_);
@@ -261,33 +255,38 @@ sub loadmoffice
     }
 }
 
-sub loadcons
+sub loadcon
 {
-    my $house = shift;
-    my $file = shift;
-    my $j = decode_json(read_file($file));
-    foreach my $cons (@$j) {
+    my $cons = shift;
+    (my $consid = $cons->{id}) =~ s#uk.org.publicwhip/cons/##;
 
-        (my $consid = $cons->{id}) =~ s#uk.org.publicwhip/cons/##;
+    my $house;
+    if ($cons->{organization_id} eq 'house-of-commons') {
+        $house = 'commons';
+    } elsif ($cons->{organization_id} eq 'scottish-parliament') {
+        $house = 'scotland';
+    } else {
+        return;
+    }
 
-        my $start_date = $cons->{start_date};
-        $start_date .= '-00-00' if length($start_date) == 4;
-        my $end_date = $cons->{end_date} || '9999-12-31';
-        $end_date .= '-00-00' if length($end_date) == 4;
+    my $start_date = $cons->{start_date};
+    $start_date .= '-00-00' if length($start_date) == 4;
+    my $end_date = $cons->{end_date} || '9999-12-31';
+    $end_date .= '-00-00' if length($end_date) == 4;
 
-        my $main_name = 1;
-        foreach my $name (@{$cons->{names}}) {
-            my $sth = PublicWhip::DB::query($dbh, "insert into pw_constituency
-                (cons_id, name, main_name, from_date, to_date, house) values
-                (?, ?, ?, ?, ?, ?)",
-                $consid,
-                encode_entities(Encode::encode('iso-8859-1', $name)),
-                $main_name,
-                $start_date,
-                $end_date,
-                $house
-            );
-            $main_name = 0;
-        }
+    my $main_name = 1;
+    my @names = ($cons->{area}{name}, @{$cons->{area}{other_names} || []});
+    foreach my $name (@names) {
+        my $sth = PublicWhip::DB::query($dbh, "insert into pw_constituency
+            (cons_id, name, main_name, from_date, to_date, house) values
+            (?, ?, ?, ?, ?, ?)",
+            $consid,
+            encode_entities(Encode::encode('iso-8859-1', $name)),
+            $main_name,
+            $start_date,
+            $end_date,
+            $house
+        );
+        $main_name = 0;
     }
 }
